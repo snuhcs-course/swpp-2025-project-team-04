@@ -1,0 +1,29 @@
+├── backend/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── config.py
+│   │   │   ├── auth.py
+│   │   │   └── init.py
+│   │   ├── database/
+│   │   │   ├── crud.py
+│   │   │   ├── models.py
+│   │   │   └── init.py
+│   │   ├── features/
+│   │   │   ├── users/
+│   │   │   │   ├── endpoints.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── init.py
+│   │   │   ├── items/
+│   │   │   │   ├── endpoints.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── init.py
+│   │   │   └── init.py
+│   │   ├── main.py
+│   │   └── init.py
+│   ├── requirements.txt
+│   ├── tests/
+│   │   └── test_main.py
+│   └── .env
+├── .gitignore
+├── README.md
+├── .env
