@@ -33,4 +33,4 @@ jobs:
         
       - name: Run tests with pytest
         run: |
-          pytest backend/tests/
+          PYTHONPATH=$PWD pytest backend/tests/ --maxfail=1 --disable-warnings -q
