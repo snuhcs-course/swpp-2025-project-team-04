@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .entities.users.endpoints import router as users_router
+from .modules.users.endpoints import router as users_router
 
 
 app = FastAPI(title="LingoFit")
