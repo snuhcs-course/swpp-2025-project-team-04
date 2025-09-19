@@ -3,8 +3,13 @@ name: Run Backend Tests
 on:
   push: 
     branches: ["main"]
+    paths:
+      - 'backend/**'
+      
   pull_request:
     branches: ["main"]
+    paths:
+      - 'backend/**'
 
 jobs:
   build:
@@ -28,4 +33,4 @@ jobs:
         
       - name: Run tests with pytest
         run: |
-          pytest backend/tests/test_main.py
+          pytest backend/tests/
