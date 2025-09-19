@@ -1,12 +1,14 @@
 from fastapi import FastAPI
-
 from .modules.auth.endpoints import router as auth_router
-
+from .modules.users.models import Base
+from .core.config import engine
 
 app = FastAPI(title="LingoFit")
 
-app.include_router(auth_router)
+# 테이블 생성
+Base.metadata.create_all(bind=engine)
 
+app.include_router(auth_router)
 
 @app.get("/")
 def read_root():

@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     db_password: str
     db_host: str
     db_name: str
+    secret_key: str
 
     class Config:
         env_file = ".env"
