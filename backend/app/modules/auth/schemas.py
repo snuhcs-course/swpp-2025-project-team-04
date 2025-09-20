@@ -30,3 +30,10 @@ class RefreshTokenResponse(BaseModel):
     refresh_token: str
 class AccessTokenResponse(BaseModel):
     access_token: str
+
+class LogoutRequest(BaseModel):
+    access_token: str
+    refresh_token: str
+
+class LogoutResponse(BaseModel):
+    message: str
