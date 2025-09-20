@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..users.crud import create_user
-from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse
-from ...core.auth import hash_password, create_access_token, verify_password, ACCESS_TOKEN_EXPIRE_MINUTES,REFRESH_TOKEN_EXPIRE_DAYS
+from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse, RefreshTokenRequest, AccessTokenResponse,RefreshTokenResponse
+from ...core.auth import hash_password, create_access_token, verify_password, verify_token, ACCESS_TOKEN_EXPIRE_MINUTES,REFRESH_TOKEN_EXPIRE_DAYS
 from ...core.config import get_db
 from datetime import timedelta
 from ..users.crud import get_user_by_username
@@ -44,3 +44,23 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     refresh_token = create_access_token(data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
     
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/reissue/access", response_model=AccessTokenResponse)
+def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    # refresh token 검증
+    token_data = verify_token(request.refresh_token)
+    username = token_data["username"]
+    
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="user not found")
+    
+    # 새로운 access token 생성
+    data = {"sub": user.username}
+    new_access_token = create_access_token(data, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    
+    return AccessTokenResponse(access_token=new_access_token)
+
+
+

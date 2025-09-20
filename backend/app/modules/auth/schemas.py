@@ -21,3 +21,12 @@ class LoginRequest(UserCredentials):
 
 class LoginResponse(TokensResponse):
     pass
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class RefreshTokenResponse(BaseModel):
+    refresh_token: str
+class AccessTokenResponse(BaseModel):
+    access_token: str
