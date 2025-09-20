@@ -7,9 +7,9 @@ from ...core.config import get_db
 from datetime import timedelta
 from ..users.crud import get_user_by_username
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/api/auth/signup/", response_model=SignupResponse, status_code=201)
+@router.post("/signup", response_model=SignupResponse, status_code=201)
 def signup(request: SignupRequest, db: Session = Depends(get_db)):
     # username 중복 체크
     if get_user_by_username(db, request.username):
