@@ -64,3 +64,22 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
 
 
 
+
+@router.post("/reissue/refresh", response_model=RefreshTokenResponse)
+def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    # refresh token 검증
+    token_data = verify_token(request.refresh_token)
+    username = token_data["username"]
+    
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="user not found")
+    
+    # 새로운 refresh token 생성
+    data = {"sub": user.username}
+    new_refresh_token = create_access_token(data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    
+    return RefreshTokenResponse(refresh_token=new_refresh_token)
+
+
+
