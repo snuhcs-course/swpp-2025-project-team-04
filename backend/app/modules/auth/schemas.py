@@ -1,9 +1,23 @@
 from pydantic import BaseModel, constr
 
-class SignupRequest(BaseModel):
+
+class UserCredentials(BaseModel):
     username: constr(min_length=3, max_length=30, pattern=r'^[a-zA-Z0-9_]+$')
     password: constr(min_length=8, max_length=128)
 
-class SignupResponse(BaseModel):
+class TokensResponse(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class SignupRequest(UserCredentials):
+    pass # TODO : 회원가입 request body fields는 추후 수정 예정
+
+class SignupResponse(TokensResponse):
+    pass
+
+class LoginRequest(UserCredentials):
+    pass
+
+class LoginResponse(TokensResponse):
+    pass
