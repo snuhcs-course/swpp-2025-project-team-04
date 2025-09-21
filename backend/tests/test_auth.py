@@ -1,5 +1,6 @@
 
 from backend.tests.test_main import client
+import json
 
 API_VERSION = "/api/v1"
 
@@ -69,3 +70,54 @@ def test_reissue_access_token_invalid_refresh_token():
     assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
     assert reissue_response_data["detail"] == "Invalid token"
+
+
+def test_delete_account_success():
+    ''' 계정 삭제 성공 테스트 '''
+    
+    # 먼저 로그인 시도
+    login_data = {
+        "username": "test_delete_user",
+        "password": "test_password123"
+    }
+    login_response = client.post(f"{API_VERSION}/auth/login", json=login_data)
+    
+    if login_response.status_code == 200:
+        # 계정이 이미 존재함
+        login_response_data = login_response.json()
+        access_token = login_response_data["access_token"]
+    else:
+        # 계정이 없으므로 새로 생성
+        signup_data = {
+            "username": "test_delete_user",
+            "password": "test_password123"
+        }
+        signup_response = client.post(f"{API_VERSION}/auth/signup", json=signup_data)
+        assert signup_response.status_code == 201
+        
+        signup_response_data = signup_response.json()
+        access_token = signup_response_data["access_token"]
+    
+    # 계정 삭제 시도
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    delete_response = client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
+    
+    assert delete_response.status_code == 200
+    delete_response_data = delete_response.json()
+    assert delete_response_data["message"] == "Account deleted successfully"
+
+
+
+def test_delete_account_invalid_token():
+    ''' 잘못된 토큰으로 계정 삭제 시 401 에러 테스트 '''
+
+    headers = {
+        "Authorization": "Bearer invalid_token"
+    }
+    delete_response = client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
+    
+    assert delete_response.status_code == 401
+    delete_response_data = delete_response.json()
+    assert delete_response_data["detail"] == "Invalid token"
