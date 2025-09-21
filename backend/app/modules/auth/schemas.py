@@ -30,3 +30,6 @@ class RefreshTokenResponse(BaseModel):
     refresh_token: str
 class AccessTokenResponse(BaseModel):
     access_token: str
+
+class DeleteAccountResponse(BaseModel):
+    message: str

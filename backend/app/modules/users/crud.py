@@ -10,3 +10,11 @@ def create_user(db: Session, username: str, hashed_password: str):
 
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
+
+def delete_user(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    if user:
+        db.delete(user)
+        db.commit()
+        return True
+    return False

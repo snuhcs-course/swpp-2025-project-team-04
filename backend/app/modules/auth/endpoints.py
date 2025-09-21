@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from ..users.crud import create_user
-from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse, RefreshTokenRequest, AccessTokenResponse,RefreshTokenResponse
+from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse, RefreshTokenRequest, AccessTokenResponse,RefreshTokenResponse, DeleteAccountResponse
 from ...core.auth import hash_password, create_access_token, verify_password, verify_token, ACCESS_TOKEN_EXPIRE_MINUTES,REFRESH_TOKEN_EXPIRE_DAYS
 from ...core.config import get_db
 from datetime import timedelta
-from ..users.crud import get_user_by_username
+from ..users.crud import get_user_by_username, delete_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -82,4 +82,26 @@ def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(ge
     return RefreshTokenResponse(refresh_token=new_refresh_token)
 
 
+@router.delete("/delete-account", response_model=DeleteAccountResponse)
+def delete_account(authorization: str = Header(), db: Session = Depends(get_db)):
+    # Bearer 토큰에서 access token 추출
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid authorization header")
+    
+    access_token = authorization[7:]
+    
+    # 토큰 검증
+    token_data = verify_token(access_token)
+    username = token_data["username"]
+    
+    # 사용자 조회
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    # 계정 삭제
+    if delete_user(db, username):
+        return DeleteAccountResponse(message="Account deleted successfully")
+    else:
+        raise HTTPException(status_code=500, detail="Failed to delete account")
 
