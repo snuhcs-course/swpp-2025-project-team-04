@@ -28,9 +28,9 @@ def create_access_token(data: dict, token_type: TokenType = TokenType.ACCESS_TOK
     to_encode = data.copy()
     
     if token_type == TokenType.REFRESH_TOKEN:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     else :
-        expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     
     to_encode.update({"exp": expire, "type": token_type.value})
