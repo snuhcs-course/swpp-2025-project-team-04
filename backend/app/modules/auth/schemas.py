@@ -36,6 +36,7 @@ class LogoutRequest(BaseModel):
     refresh_token: str
 
 class LogoutResponse(BaseModel):
+    message: str
 
 class DeleteAccountResponse(BaseModel):
     message: str
