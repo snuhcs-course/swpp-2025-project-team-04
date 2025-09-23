@@ -5,7 +5,7 @@ from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse,
 from ...core.auth import hash_password, create_access_token, verify_password, verify_token, TokenType
 from ...core.config import get_db
 from ..users.crud import get_user_by_username, delete_user
-
+from ...core.exceptions import UserNotFoundException, InvalidCredentialsException
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -26,16 +26,19 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     return SignupResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=LoginResponse, responses={
+        **UserNotFoundException.openapi_example(),
+        **InvalidCredentialsException.openapi_example(),
+    })
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     # 사용자 조회
     user = get_user_by_username(db, request.username)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise UserNotFoundException()
     
     # 비밀번호 검증
     if not verify_password(request.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise InvalidCredentialsException()
     
     # 토큰 생성
     data = {"sub": user.username}

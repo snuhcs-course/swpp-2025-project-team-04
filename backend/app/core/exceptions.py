@@ -1,10 +1,12 @@
-from fastapi import HTTPException
 from pydantic import BaseModel
+from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 
 class ErrorResponse(BaseModel):
     status_code: int
     custom_code: str
     detail: str
+
 
 
 class AppException(HTTPException):
@@ -18,7 +20,7 @@ class AppException(HTTPException):
 
     @classmethod
     def openapi_example(cls):
-        """swagger error response example"""
+        """swagger error response examples에 등록"""
         return {
             cls().status_code: {
                 "model": ErrorResponse,
@@ -34,6 +36,19 @@ class AppException(HTTPException):
                 },
             }
         }
+
+def register_exception_handlers(app):
+    @app.exception_handler(AppException)
+    async def app_exception_handler(request: Request, exc: AppException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "status_code": exc.status_code,
+                "custom_code": exc.custom_code,
+                "detail": exc.detail,
+            },
+        )
+
 
 
 class UserNotFoundException(AppException):
@@ -54,3 +69,5 @@ class UsernameExistsException(AppException):
 class AuthTokenExpiredException(AppException):
     def __init__(self):
         super().__init__(401, "AUTH_TOKEN_EXPIRED", "Authentication token has expired.")
+
+
