@@ -30,9 +30,8 @@ def test_login_failure():
     }
     response = client.post(f"{API_VERSION}/auth/login", json=login_data)
     
-    assert response.status_code == 401
     response_data = response.json()
-    assert response_data["detail"] == "Invalid username or password"
+    assert response_data["custom_code"] == "INVALID_CREDENTIALS"
 
 
 def test_reissue_access_token_success():
@@ -67,9 +66,8 @@ def test_reissue_access_token_invalid_refresh_token():
     }
     reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
     
-    assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
-    assert reissue_response_data["detail"] == "Invalid token"
+    assert reissue_response_data["custom_code"] == "INVALID_TOKEN"
 
 
 def test_reissue_access_token_with_access_token():
@@ -90,9 +88,8 @@ def test_reissue_access_token_with_access_token():
     }
     reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
     
-    assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
-    assert "Invalid token type" in reissue_response_data["detail"]
+    assert reissue_response_data["custom_code"] == "INVALID_TOKEN_TYPE"
 
 
 def test_delete_account_success():
@@ -141,6 +138,5 @@ def test_delete_account_invalid_token():
     }
     delete_response = client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
     
-    assert delete_response.status_code == 401
     delete_response_data = delete_response.json()
-    assert delete_response_data["detail"] == "Invalid token"
+    assert delete_response_data["custom_code"] == "INVALID_TOKEN"

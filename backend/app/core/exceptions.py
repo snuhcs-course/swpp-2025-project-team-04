@@ -10,9 +10,7 @@ class ErrorResponse(BaseModel):
 
 
 class AppException(HTTPException):
-    status_code: int
     custom_code: str
-    detail: str
 
     def __init__(self, status_code: int, custom_code: str, detail: str):
         super().__init__(status_code=status_code, detail=detail)
@@ -55,7 +53,6 @@ class UserNotFoundException(AppException):
     def __init__(self):
         super().__init__(404, "USER_NOT_FOUND", "The requested user does not exist.")
 
-
 class InvalidCredentialsException(AppException):
     def __init__(self):
         super().__init__(401, "INVALID_CREDENTIALS", "Invalid username or password")
@@ -65,9 +62,30 @@ class UsernameExistsException(AppException):
     def __init__(self):
         super().__init__(400, "USERNAME_EXISTS", "Username already exists.")
 
+class AccountDeletionFailedException(AppException):
+    def __init__(self):
+        super().__init__(500, "ACCOUNT_DELETION_FAILED", "Failed to delete account")
+
+
+
+
 
 class AuthTokenExpiredException(AppException):
     def __init__(self):
         super().__init__(401, "AUTH_TOKEN_EXPIRED", "Authentication token has expired.")
 
+
+class InvalidTokenException(AppException):
+    def __init__(self):
+        super().__init__(401, "INVALID_TOKEN", "Token is invalid")
+
+
+class InvalidTokenTypeException(AppException):
+    def __init__(self):
+        super().__init__(401, "INVALID_TOKEN_TYPE", "Invalid token type")
+
+
+class InvalidAuthHeaderException(AppException):
+    def __init__(self):
+        super().__init__(401, "INVALID_AUTH_HEADER", "Invalid authorization header")
 

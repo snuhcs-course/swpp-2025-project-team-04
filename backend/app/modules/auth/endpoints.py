@@ -5,16 +5,27 @@ from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse,
 from ...core.auth import hash_password, create_access_token, verify_password, verify_token, TokenType
 from ...core.config import get_db
 from ..users.crud import get_user_by_username, delete_user
-from ...core.exceptions import UserNotFoundException, InvalidCredentialsException
+from ...core.exceptions import (
+    UserNotFoundException, 
+    InvalidCredentialsException, 
+    UsernameExistsException,
+    AuthTokenExpiredException,
+    InvalidAuthHeaderException,
+    AccountDeletionFailedException,
+    InvalidTokenException,
+    InvalidTokenTypeException
+)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 
-@router.post("/signup", response_model=SignupResponse, status_code=201)
+@router.post("/signup", response_model=SignupResponse, status_code=201, responses={
+    **UsernameExistsException.openapi_example(),
+})
 def signup(request: SignupRequest, db: Session = Depends(get_db)):
     # username 중복 체크
     if get_user_by_username(db, request.username):
-        raise HTTPException(status_code=400, detail="username already exists.")
+        raise UsernameExistsException()
     # 비밀번호 해싱
     hashed_pw = hash_password(request.password)
     # 유저 생성
@@ -48,7 +59,12 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/reissue/access", response_model=AccessTokenResponse)
+@router.post("/reissue/access", response_model=AccessTokenResponse, responses={
+    **UserNotFoundException.openapi_example(),
+    **AuthTokenExpiredException.openapi_example(),
+    **InvalidTokenException.openapi_example(),
+    **InvalidTokenTypeException.openapi_example(),
+})
 def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     # refresh token 검증
     token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
@@ -56,7 +72,7 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
     
     user = get_user_by_username(db, username)
     if not user:
-        raise HTTPException(status_code=401, detail="user not found")
+        raise UserNotFoundException()
     
     # 새로운 access token 생성
     data = {"sub": user.username}
@@ -67,7 +83,12 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
 
 
 
-@router.post("/reissue/refresh", response_model=RefreshTokenResponse)
+@router.post("/reissue/refresh", response_model=RefreshTokenResponse, responses={
+    **UserNotFoundException.openapi_example(),
+    **AuthTokenExpiredException.openapi_example(),
+    **InvalidTokenException.openapi_example(),
+    **InvalidTokenTypeException.openapi_example(),
+})
 def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     # refresh token 검증
     token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
@@ -75,7 +96,7 @@ def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(ge
     
     user = get_user_by_username(db, username)
     if not user:
-        raise HTTPException(status_code=401, detail="user not found")
+        raise UserNotFoundException()
     
     # 새로운 refresh token 생성
     data = {"sub": user.username}
@@ -84,11 +105,18 @@ def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(ge
     return RefreshTokenResponse(refresh_token=new_refresh_token)
 
 
-@router.delete("/delete-account", response_model=DeleteAccountResponse)
+@router.delete("/delete-account", response_model=DeleteAccountResponse, responses={
+    **InvalidAuthHeaderException.openapi_example(),
+    **UserNotFoundException.openapi_example(),
+    **AuthTokenExpiredException.openapi_example(),
+    **InvalidTokenException.openapi_example(),
+    **InvalidTokenTypeException.openapi_example(),
+    **AccountDeletionFailedException.openapi_example(),
+})
 def delete_account(authorization: str = Header(), db: Session = Depends(get_db)):
     # Bearer 토큰에서 access token 추출
     if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
+        raise InvalidAuthHeaderException()
     
     access_token = authorization[7:]
     
@@ -99,11 +127,11 @@ def delete_account(authorization: str = Header(), db: Session = Depends(get_db))
     # 사용자 조회
     user = get_user_by_username(db, username)
     if not user:
-        raise HTTPException(status_code=401, detail="User not found")
+        raise UserNotFoundException()
     
     # 계정 삭제
     if delete_user(db, username):
         return DeleteAccountResponse(message="Account deleted successfully")
     else:
-        raise HTTPException(status_code=500, detail="Failed to delete account")
+        raise AccountDeletionFailedException()
 
