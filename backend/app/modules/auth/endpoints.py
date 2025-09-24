@@ -45,7 +45,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     # 사용자 조회
     user = get_user_by_username(db, request.username)
     if not user:
-        raise UserNotFoundException()
+        raise InvalidCredentialsException()
     
     # 비밀번호 검증
     if not verify_password(request.password, user.hashed_password):
