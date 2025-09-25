@@ -4,7 +4,6 @@ from ..users.crud import create_user
 from .schemas import SignupRequest, SignupResponse, LoginRequest, LoginResponse, RefreshTokenRequest, AccessTokenResponse,RefreshTokenResponse, LogoutRequest, LogoutResponse, DeleteAccountResponse
 from ...core.auth import hash_password, create_access_token, verify_password, verify_token, ACCESS_TOKEN_EXPIRE_MINUTES,REFRESH_TOKEN_EXPIRE_DAYS, add_token_to_blocklist
 from ...core.config import get_db
-from datetime import timedelta
 from ..users.crud import get_user_by_username, delete_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -22,8 +21,8 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     user = create_user(db, request.username, hashed_pw)
     # 토큰 생성
     data = {"sub": user.username}
-    access_token = create_access_token(data, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    refresh_token = create_access_token(data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
+    refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
     return SignupResponse(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -40,8 +39,8 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     
     # 토큰 생성
     data = {"sub": user.username}
-    access_token = create_access_token(data, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    refresh_token = create_access_token(data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
+    refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
     
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
@@ -49,7 +48,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/reissue/access", response_model=AccessTokenResponse)
 def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     # refresh token 검증
-    token_data = verify_token(request.refresh_token)
+    token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
     username = token_data["username"]
     
     user = get_user_by_username(db, username)
@@ -58,7 +57,7 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
     
     # 새로운 access token 생성
     data = {"sub": user.username}
-    new_access_token = create_access_token(data, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    new_access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
     
     return AccessTokenResponse(access_token=new_access_token)
 
@@ -68,7 +67,7 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
 @router.post("/reissue/refresh", response_model=RefreshTokenResponse)
 def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     # refresh token 검증
-    token_data = verify_token(request.refresh_token)
+    token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
     username = token_data["username"]
     
     user = get_user_by_username(db, username)
@@ -77,7 +76,7 @@ def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(ge
     
     # 새로운 refresh token 생성
     data = {"sub": user.username}
-    new_refresh_token = create_access_token(data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    new_refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
     
     return RefreshTokenResponse(refresh_token=new_refresh_token)
 
@@ -100,7 +99,7 @@ def delete_account(authorization: str = Header(), db: Session = Depends(get_db))
     access_token = authorization[7:]
     
     # 토큰 검증
-    token_data = verify_token(access_token)
+    token_data = verify_token(access_token, TokenType.ACCESS_TOKEN)
     username = token_data["username"]
     
     # 사용자 조회

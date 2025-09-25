@@ -85,6 +85,7 @@ def test_logout_success():
     
     login_response_data = login_response.json()
     access_token = login_response_data["access_token"]
+    
     refresh_token = login_response_data["refresh_token"]
     
     # 로그아웃 시도
@@ -125,12 +126,31 @@ def test_logout_blocklisted_token_usage():
     # 블록리스트된 refresh token으로 access token 재발급 시도 (실패해야 함)
     reissue_data = {
         "refresh_token": refresh_token
+      
+    assert reissue_response_data["detail"] == "Token has been revoked"
+
+def test_reissue_access_token_with_access_token():
+    ''' access token으로 access token 재발급 시도 시 토큰 타입 에러 테스트 '''
+    
+    login_data = {
+        "username": DUMMY_USER_USERNAME,
+        "password": DUMMY_USER_PASSWORD
+    }
+    login_response = client.post(f"{API_VERSION}/auth/login", json=login_data)
+    assert login_response.status_code == 200
+    
+    login_response_data = login_response.json()
+    access_token = login_response_data["access_token"]
+    
+    reissue_data = {
+        "refresh_token": access_token  # refresh_token 자리에 access_token 사용
     }
     reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
     
     assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
-    assert reissue_response_data["detail"] == "Token has been revoked"
+
+    assert "Invalid token type" in reissue_response_data["detail"]
 
 def test_delete_account_success():
     ''' 계정 삭제 성공 테스트 '''

@@ -1,4 +1,5 @@
 venv/
 .env
+backend/.env
 __pycache__/
 ec2key.pem
