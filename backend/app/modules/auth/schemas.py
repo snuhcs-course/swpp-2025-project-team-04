@@ -31,5 +31,12 @@ class RefreshTokenResponse(BaseModel):
 class AccessTokenResponse(BaseModel):
     access_token: str
 
+class LogoutRequest(BaseModel):
+    access_token: str
+    refresh_token: str
+
+class LogoutResponse(BaseModel):
+    message: str
+
 class DeleteAccountResponse(BaseModel):
     message: str
