@@ -5,8 +5,10 @@ from .core.config import engine, Base
 
 app = FastAPI(title="LingoFit")
 
-# 테이블 생성
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database tables on application startup"""
+    Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router, prefix = "/api/v1")
 app.include_router(users_router, prefix = "/api/v1")
