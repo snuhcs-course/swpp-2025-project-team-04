@@ -126,7 +126,11 @@ def test_logout_blocklisted_token_usage():
     # 블록리스트된 refresh token으로 access token 재발급 시도 (실패해야 함)
     reissue_data = {
         "refresh_token": refresh_token
-      
+    }
+    reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
+    
+    assert reissue_response.status_code == 401
+    reissue_response_data = reissue_response.json()
     assert reissue_response_data["detail"] == "Token has been revoked"
 
 def test_reissue_access_token_with_access_token():
