@@ -48,7 +48,7 @@ def is_token_blocklisted(token: str) -> bool:
     """Check if a token is in the blocklist"""
     return token in _jwt_blocklist
 
-def verify_token(token: str) -> dict:
+def verify_token(token: str, expected_type: TokenType) -> dict:
     try:
         # Check if token is blocklisted
         if is_token_blocklisted(token):
