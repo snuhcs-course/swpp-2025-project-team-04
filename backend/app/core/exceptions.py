@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 class ErrorResponse(BaseModel):
     status_code: int
@@ -16,38 +17,79 @@ class AppException(HTTPException):
         super().__init__(status_code=status_code, detail=detail)
         self.custom_code = custom_code
 
-    @classmethod
-    def openapi_example(cls):
-        """swagger error response examples에 등록"""
-        return {
-            cls().status_code: {
-                "model": ErrorResponse,
-                "description": cls().detail,
-                "content": {
-                    "application/json": {
-                        "example": {
-                            "status_code": cls().status_code,
-                            "custom_code": cls().custom_code,
-                            "detail": cls().detail,
-                        }
-                    }
-                },
+    @staticmethod
+    def to_openapi_examples(cls_list):
+        """
+        cls_list: 예외 클래스 리스트
+        동일 status_code 예외는 examples로 묶음
+        Description은 비워두거나 고정 메시지
+        Example Value는 code/detail 그대로
+        """
+        responses = {}
+        for cls_ in cls_list:
+            inst = cls_()
+            sc = inst.status_code
+
+            if sc not in responses:
+                responses[sc] = {
+                    "model": ErrorResponse,
+                    "description": "",  
+                    "content": {"application/json": {"examples": {}}}
+                }
+
+            # Example Value
+            responses[sc]["content"]["application/json"]["examples"][inst.custom_code] = {
+                "summary": inst.custom_code,
+                "value": {
+                    "status_code": inst.status_code,
+                    "code": inst.custom_code,
+                    "detail": inst.detail
+                }
             }
-        }
+        return responses
+
+
+
+
 
 def register_exception_handlers(app):
+    # 기존 AppException 처리
     @app.exception_handler(AppException)
     async def app_exception_handler(request: Request, exc: AppException):
         return JSONResponse(
             status_code=exc.status_code,
             content={
                 "status_code": exc.status_code,
-                "custom_code": exc.custom_code,
+                "code": exc.custom_code,
                 "detail": exc.detail,
             },
         )
 
+    # Pydantic ValidationError 
+    @app.exception_handler(ValidationError)
+    async def pydantic_validation_exception_handler(request: Request, exc: ValidationError):
+        for error in exc.raw_errors:
+            if isinstance(error.exc, AppException):
+                app_exc = error.exc
+                return JSONResponse(
+                    status_code=app_exc.status_code,
+                    content={
+                        "status_code": app_exc.status_code,
+                        "code": app_exc.custom_code,
+                        "detail": app_exc.detail
+                    }
+                )
+        first_error = exc.errors()[0]
+        return JSONResponse(
+            status_code=422,
+            content={
+                "status_code": 422,
+                "code": "VALIDATION_ERROR",
+                "detail": first_error.get("msg", "Invalid input")
+            }
+        )
 
+# user
 
 class UserNotFoundException(AppException):
     def __init__(self):
@@ -56,6 +98,15 @@ class UserNotFoundException(AppException):
 class InvalidCredentialsException(AppException):
     def __init__(self):
         super().__init__(401, "INVALID_CREDENTIALS", "Invalid username or password")
+
+class InvalidUsernameFormatException(AppException):
+    def __init__(self):
+        super().__init__(422, "INVALID_USERNAME_FORMAT", "아이디는 6~16자, 숫자와 영문 대/소문자만 허용됩니다")
+
+
+class InvalidPasswordFormatException(AppException):
+    def __init__(self):
+        super().__init__(422, "INVALID_PASSWORD_FORMAT", "비밀번호는 8~32자, 숫자와 알파벳을 최소 1개 이상 포함해야 합니다")
 
 
 class UsernameExistsException(AppException):
@@ -67,8 +118,7 @@ class AccountDeletionFailedException(AppException):
         super().__init__(500, "ACCOUNT_DELETION_FAILED", "Failed to delete account")
 
 
-
-
+# token
 
 class AuthTokenExpiredException(AppException):
     def __init__(self):
@@ -88,4 +138,5 @@ class InvalidTokenTypeException(AppException):
 class InvalidAuthHeaderException(AppException):
     def __init__(self):
         super().__init__(401, "INVALID_AUTH_HEADER", "Invalid authorization header")
+
 

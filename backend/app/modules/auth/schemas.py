@@ -1,9 +1,29 @@
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Field, field_validator
+import re
+from ...core.exceptions import InvalidUsernameFormatException, InvalidPasswordFormatException
 
 
 class UserCredentials(BaseModel):
-    username: constr(min_length=3, max_length=30, pattern=r'^[a-zA-Z0-9_]+$')
-    password: constr(min_length=8, max_length=128)
+    username: str  # min_length, max_length 제거
+    password: str  # min_length, max_length 제거
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v):
+        if not (6 <= len(v) <= 16):
+            raise InvalidUsernameFormatException()
+        if not re.match(r"^[a-zA-Z0-9]+$", v):
+            raise InvalidUsernameFormatException()
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v):
+        if not (8 <= len(v) <= 32):
+            raise InvalidPasswordFormatException()
+        if not re.search(r"[a-zA-Z]", v) or not re.search(r"[0-9]", v):
+            raise InvalidPasswordFormatException()
+        return v
 
 class TokensResponse(BaseModel):
     access_token: str
