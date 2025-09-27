@@ -10,7 +10,7 @@ on:
     branches: ["dev-backend"]
     paths:
       - 'backend/**'
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
