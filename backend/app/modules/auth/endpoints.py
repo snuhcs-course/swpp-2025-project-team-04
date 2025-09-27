@@ -68,7 +68,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/reissue/access", response_model=AccessTokenResponse, 
+@router.post("/refresh/access", response_model=AccessTokenResponse, 
              responses=AppException.to_openapi_examples([
                  UserNotFoundException,
                  AuthTokenExpiredException,
@@ -91,29 +91,6 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
     return AccessTokenResponse(access_token=new_access_token)
 
 
-
-
-@router.post("/reissue/refresh", response_model=RefreshTokenResponse, 
-             responses=AppException.to_openapi_examples([
-                 UserNotFoundException,
-                 AuthTokenExpiredException,
-                 InvalidTokenException,
-                 InvalidTokenTypeException
-             ]))
-def reissue_refresh_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
-    # refresh token 검증
-    token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
-    username = token_data["username"]
-    
-    user = get_user_by_username(db, username)
-    if not user:
-        raise UserNotFoundException()
-    
-    # 새로운 refresh token 생성
-    data = {"sub": user.username}
-    new_refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
-    
-    return RefreshTokenResponse(refresh_token=new_refresh_token)
 
 
 @router.delete("/delete-account", response_model=DeleteAccountResponse,

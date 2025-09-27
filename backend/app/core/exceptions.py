@@ -42,7 +42,7 @@ class AppException(HTTPException):
                 "summary": inst.custom_code,
                 "value": {
                     "status_code": inst.status_code,
-                    "code": inst.custom_code,
+                    "custom_code": inst.custom_code,
                     "detail": inst.detail
                 }
             }
@@ -60,7 +60,7 @@ def register_exception_handlers(app):
             status_code=exc.status_code,
             content={
                 "status_code": exc.status_code,
-                "code": exc.custom_code,
+                "custom_code": exc.custom_code,
                 "detail": exc.detail,
             },
         )
@@ -75,7 +75,7 @@ def register_exception_handlers(app):
                     status_code=app_exc.status_code,
                     content={
                         "status_code": app_exc.status_code,
-                        "code": app_exc.custom_code,
+                        "custom_code": app_exc.custom_code,
                         "detail": app_exc.detail
                     }
                 )
@@ -84,7 +84,7 @@ def register_exception_handlers(app):
             status_code=422,
             content={
                 "status_code": 422,
-                "code": "VALIDATION_ERROR",
+                "custom_code": "VALIDATION_ERROR",
                 "detail": first_error.get("msg", "Invalid input")
             }
         )
