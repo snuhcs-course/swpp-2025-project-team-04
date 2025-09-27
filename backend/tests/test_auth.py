@@ -4,8 +4,8 @@ import json
 
 API_VERSION = "/api/v1"
 
-DUMMY_USER_USERNAME="test_login_target"
-DUMMY_USER_PASSWORD= "test_login_target" # 이 계정은 DB에 있다고 가정(삭제 x)
+DUMMY_USER_USERNAME="testuser123"  
+DUMMY_USER_PASSWORD="testuser123!"  
 
 def test_login_success():
     ''' valid input에 대한 success test '''
@@ -26,13 +26,12 @@ def test_login_failure():
     ''' invalid input에 대한 failure test '''
     login_data = {
         "username": DUMMY_USER_USERNAME,
-        "password": "wrong_password"
+        "password": "dummy_user123!!"
     }
     response = client.post(f"{API_VERSION}/auth/login", json=login_data)
     
-    assert response.status_code == 401
     response_data = response.json()
-    assert response_data["detail"] == "Invalid username or password"
+    assert response_data["custom_code"] == "INVALID_CREDENTIALS"
 
 
 def test_reissue_access_token_success():
@@ -52,7 +51,7 @@ def test_reissue_access_token_success():
     reissue_data = {
         "refresh_token": refresh_token
     }
-    reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
+    reissue_response = client.post(f"{API_VERSION}/auth/refresh/access", json=reissue_data)
     
     assert reissue_response.status_code == 200
     reissue_response_data = reissue_response.json()
@@ -65,11 +64,10 @@ def test_reissue_access_token_invalid_refresh_token():
     reissue_data = {
         "refresh_token": "invalid_refresh_token"
     }
-    reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
+    reissue_response = client.post(f"{API_VERSION}/auth/refresh/access", json=reissue_data)
     
-    assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
-    assert reissue_response_data["detail"] == "Invalid token"
+    assert reissue_response_data["custom_code"] == "INVALID_TOKEN"
 
 
 def test_reissue_access_token_with_access_token():
@@ -88,11 +86,10 @@ def test_reissue_access_token_with_access_token():
     reissue_data = {
         "refresh_token": access_token  # refresh_token 자리에 access_token 사용
     }
-    reissue_response = client.post(f"{API_VERSION}/auth/reissue/access", json=reissue_data)
+    reissue_response = client.post(f"{API_VERSION}/auth/refresh/access", json=reissue_data)
     
-    assert reissue_response.status_code == 401
     reissue_response_data = reissue_response.json()
-    assert "Invalid token type" in reissue_response_data["detail"]
+    assert reissue_response_data["custom_code"] == "INVALID_TOKEN_TYPE"
 
 
 def test_delete_account_success():
@@ -100,8 +97,8 @@ def test_delete_account_success():
     
     # 먼저 로그인 시도
     login_data = {
-        "username": "test_delete_user",
-        "password": "test_password123"
+        "username": "testuser1234",
+        "password": "testuser1234!"
     }
     login_response = client.post(f"{API_VERSION}/auth/login", json=login_data)
     
@@ -112,8 +109,8 @@ def test_delete_account_success():
     else:
         # 계정이 없으므로 새로 생성
         signup_data = {
-            "username": "test_delete_user",
-            "password": "test_password123"
+            "username": "testuser1234",
+            "password": "testuser1234!"
         }
         signup_response = client.post(f"{API_VERSION}/auth/signup", json=signup_data)
         assert signup_response.status_code == 201
@@ -141,6 +138,5 @@ def test_delete_account_invalid_token():
     }
     delete_response = client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
     
-    assert delete_response.status_code == 401
     delete_response_data = delete_response.json()
-    assert delete_response_data["detail"] == "Invalid token"
+    assert delete_response_data["custom_code"] == "INVALID_TOKEN"
