@@ -51,11 +51,10 @@ def read_users(skip: int = 0, limit: int = 100):
 def get_me(current_user = Depends(get_current_user)):
     return {
         "id": current_user.id,
-        "username": current_user.username,
-        "email": f"{current_user.username}@example.com"
+        "username": current_user.username
     }
 
 
 @router.get("/{user_id}", response_model=schemas.User)
 def read_user(user_id: int):
-    return {"id": user_id, "username": "user", "email": "user@example.com"}
+    return {"id": user_id, "username": "user"}
