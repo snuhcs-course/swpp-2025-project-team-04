@@ -16,7 +16,7 @@ from ...core.exceptions import (
 )
 
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/user", tags=["user"])
 
 
 def get_current_user(authorization: str = Header(), db: Session = Depends(get_db)):
@@ -51,7 +51,8 @@ def read_users(skip: int = 0, limit: int = 100):
 def get_me(current_user = Depends(get_current_user)):
     return {
         "id": current_user.id,
-        "username": current_user.username
+        "username": current_user.username,
+        "nickname": current_user.nickname
     }
 
 
