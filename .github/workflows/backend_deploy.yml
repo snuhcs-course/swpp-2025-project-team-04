@@ -29,7 +29,6 @@ jobs:
             docker stop backend || true
             docker rm backend || true
 
-            docker rmi backend-image || true
 
             docker build -t backend-image ./backend
 
