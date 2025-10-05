@@ -35,12 +35,17 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     # 비밀번호 해싱
     hashed_pw = hash_password(request.password)
     # 유저 생성
-    user = create_user(db, request.username, hashed_pw)
+    nickname = request.nickname if request.nickname.strip() else request.username
+    user = create_user(db, request.username, hashed_pw, nickname)
     # 토큰 생성
     data = {"sub": user.username}
     access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
     refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
-    return SignupResponse(access_token=access_token, refresh_token=refresh_token)
+    return SignupResponse(
+        access_token=access_token, 
+        refresh_token=refresh_token,
+        user={"id": user.id, "username": user.username, "nickname": user.nickname}
+    )
 
 
 @router.post("/login", response_model=LoginResponse, 
@@ -65,7 +70,11 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
     refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
     
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+    return LoginResponse(
+        access_token=access_token, 
+        refresh_token=refresh_token,
+        user={"id": user.id, "username": user.username, "nickname": user.nickname}
+    )
 
 
 @router.post("/refresh/access", response_model=AccessTokenResponse, 
