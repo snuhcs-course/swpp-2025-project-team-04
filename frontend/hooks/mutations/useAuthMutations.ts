@@ -18,8 +18,8 @@ export const useSignup = () => {
     onSuccess: (data) => {
       // data: { user, accessToken, refreshToken }
       queryClient.setQueryData<User | null>(USER_QUERY_KEY, data.user);
-      setAccessToken(data.accessToken);
-      saveRefreshToken(data.refreshToken);
+      setAccessToken(data.access_token);
+      saveRefreshToken(data.refresh_token);
       console.log('회원가입 성공 및 모든 토큰/정보 저장 완료');
       router.replace('/');
     },
@@ -36,8 +36,8 @@ export const useLogin = () => {
     onSuccess: (data) => {
       // data: { user, accessToken, refreshToken }
       queryClient.setQueryData(USER_QUERY_KEY, data.user);
-      setAccessToken(data.accessToken);
-      saveRefreshToken(data.refreshToken);
+      setAccessToken(data.access_token);
+      saveRefreshToken(data.refresh_token);
       console.log('로그인 성공 및 모든 토큰/정보 저장 완료');
       router.replace('/');
     },

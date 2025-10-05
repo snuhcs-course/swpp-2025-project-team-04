@@ -4,15 +4,15 @@ import { customFetch } from './client';
 // --- Types ---
 
 export type SignupPayload = {
-  name: string;
+  nickname: string;
   username: string;
   password: string;
 };
 
 export type SignupResponse = {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
+  user?: User;
+  access_token: string;
+  refresh_token: string;
 };
 
 export type LoginPayload = {
@@ -21,9 +21,9 @@ export type LoginPayload = {
 };
 
 export type LoginResponse = {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
+  user?: User;
+  access_token: string;
+  refresh_token: string;
 };
 
 // --- API functions ---

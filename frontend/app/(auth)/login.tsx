@@ -47,7 +47,7 @@ export default function LoginScreen() {
       <View className="flex-1 justify-center bg-white px-6 dark:bg-neutral-950">
         <View className="w-full max-w-md self-center">
           <Text className="mb-8 text-center text-3xl font-semibold text-neutral-900 dark:text-white">
-            Welcome back
+            LingoFit
           </Text>
 
           <View className="mb-4">
