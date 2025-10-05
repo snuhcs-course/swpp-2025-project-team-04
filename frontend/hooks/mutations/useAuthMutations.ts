@@ -1,4 +1,4 @@
-import { login, logout, signup } from '@/api/auth';
+import { login, signup } from '@/api/auth';
 import { USER_QUERY_KEY } from '@/constants/queryKeys';
 import type { User } from '@/types/type';
 import {
@@ -47,16 +47,8 @@ export const useLogin = () => {
 
 export const useLogout = () => {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
-  return useMutation<void, Error, void>({
-    mutationFn: logout,
-    onSuccess: () => {
-      console.log('로그아웃 성공. 모든 로컬 인증 정보를 삭제합니다.');
-      setAccessToken(null);
-      deleteRefreshToken();
-      queryClient.removeQueries({ queryKey: USER_QUERY_KEY });
-      router.replace('/(auth)/login');
-    },
-  });
+  setAccessToken(null);
+  deleteRefreshToken();
+  queryClient.setQueryData(USER_QUERY_KEY, null);
 };

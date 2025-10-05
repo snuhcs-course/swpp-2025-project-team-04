@@ -13,15 +13,15 @@ import {
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [nickname, setNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const signupMutation = useSignup();
 
   const handleSubmit = () => {
-    if (!name || !username || !password) {
+    if (!username || !password || !nickname) {
       setErrorMessage('All fields are required.');
       return;
     }
@@ -29,7 +29,7 @@ export default function SignUpScreen() {
     setErrorMessage(null);
 
     signupMutation.mutate(
-      { name, username, password },
+      { username, password, nickname },
       {
         onSuccess: () => {
           router.replace('/login');
@@ -59,12 +59,12 @@ export default function SignUpScreen() {
 
             <View className="mb-4">
               <Text className="mb-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Name
+                Nickname
               </Text>
               <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="Jane Doe"
+                value={nickname}
+                onChangeText={setNickname}
+                placeholder="your nickname"
                 placeholderTextColor="#9ca3af"
                 className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
                 editable={!signupMutation.isPending}
