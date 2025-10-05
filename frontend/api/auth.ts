@@ -43,7 +43,3 @@ export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
     body: JSON.stringify(payload),
   });
 };
-
-// export const logout = async (): Promise<void> => {
-//   return customFetch<void>('/auth/logout', { method: 'POST' });
-// };
