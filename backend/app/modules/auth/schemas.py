@@ -25,6 +25,11 @@ class UserCredentials(BaseModel):
             raise InvalidPasswordFormatException()
         return v
 
+class UserInfo(BaseModel):
+    id: int
+    username: str
+    nickname: str
+
 class TokensResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -34,13 +39,13 @@ class SignupRequest(UserCredentials):
     nickname: str = Field("", max_length=50)
 
 class SignupResponse(TokensResponse):
-    pass
+    user: UserInfo
 
 class LoginRequest(UserCredentials):
     pass
 
 class LoginResponse(TokensResponse):
-    pass
+    user: UserInfo
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str

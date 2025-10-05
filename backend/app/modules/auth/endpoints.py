@@ -41,7 +41,11 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     data = {"sub": user.username}
     access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
     refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
-    return SignupResponse(access_token=access_token, refresh_token=refresh_token)
+    return SignupResponse(
+        access_token=access_token, 
+        refresh_token=refresh_token,
+        user={"id": user.id, "username": user.username, "nickname": user.nickname}
+    )
 
 
 @router.post("/login", response_model=LoginResponse, 
@@ -66,7 +70,11 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     access_token = create_access_token(data, TokenType.ACCESS_TOKEN)
     refresh_token = create_access_token(data, TokenType.REFRESH_TOKEN)
     
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+    return LoginResponse(
+        access_token=access_token, 
+        refresh_token=refresh_token,
+        user={"id": user.id, "username": user.username, "nickname": user.nickname}
+    )
 
 
 @router.post("/refresh/access", response_model=AccessTokenResponse, 
