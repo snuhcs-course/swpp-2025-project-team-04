@@ -4,9 +4,9 @@ import { customFetch } from './client';
 // --- Types ---
 
 export type SignupPayload = {
-  nickname: string;
   username: string;
   password: string;
+  nickname: string;
 };
 
 export type SignupResponse = {
@@ -44,6 +44,6 @@ export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
   });
 };
 
-export const logout = async (): Promise<void> => {
-  return customFetch<void>('/auth/logout', { method: 'POST' });
-};
+// export const logout = async (): Promise<void> => {
+//   return customFetch<void>('/auth/logout', { method: 'POST' });
+// };
