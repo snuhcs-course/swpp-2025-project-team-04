@@ -2,15 +2,15 @@ name: Run Backend Tests
 
 on:
   push: 
-    branches: ["main"]
+    branches: ["dev-backend"]
     paths:
       - 'backend/**'
       
   pull_request:
-    branches: ["main"]
+    branches: ["dev-backend"]
     paths:
       - 'backend/**'
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest

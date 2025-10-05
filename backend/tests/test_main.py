@@ -12,6 +12,6 @@ def test_read_root():
 
 
 def test_read_users():
-    response = client.get("/api/v1/users/")
+    response = client.get("/api/v1/user/")
     assert response.status_code == 200
     assert response.json() == []
