@@ -7,6 +7,53 @@ API_VERSION = "/api/v1"
 DUMMY_USER_USERNAME="testuser123"  
 DUMMY_USER_PASSWORD="testuser123!"  
 
+def test_signup_success():
+    signup_data = {
+        "username": "signuptest123",
+        "password": "signuptest123!"
+        # No nickname provided - should default to username
+    }
+    
+    response = client.post(f"{API_VERSION}/auth/signup", json=signup_data)
+    
+    assert response.status_code == 201
+    response_data = response.json()
+    assert "access_token" in response_data
+    assert "refresh_token" in response_data
+    assert "user" in response_data
+    assert response_data["user"]["username"] == "signuptest123"
+    assert response_data["user"]["nickname"] == "signuptest123"  # Should default to username
+    assert "id" in response_data["user"]
+    
+    # Clean up - delete the test user
+    headers = {"Authorization": f"Bearer {response_data['access_token']}"}
+    client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
+
+
+def test_signup_with_custom_nickname():
+    ''' Test successful signup with custom nickname '''
+    signup_data = {
+        "username": "signuptest456",
+        "password": "signuptest456!",
+        "nickname": "customnick456"
+    }
+    
+    response = client.post(f"{API_VERSION}/auth/signup", json=signup_data)
+    
+    assert response.status_code == 201
+    response_data = response.json()
+    assert "access_token" in response_data
+    assert "refresh_token" in response_data
+    assert "user" in response_data
+    assert response_data["user"]["username"] == "signuptest456"
+    assert response_data["user"]["nickname"] == "customnick456"  # Should use provided nickname
+    assert "id" in response_data["user"]
+    
+    # Clean up - delete the test user
+    headers = {"Authorization": f"Bearer {response_data['access_token']}"}
+    client.delete(f"{API_VERSION}/auth/delete-account", headers=headers)
+
+
 def test_login_success():
     ''' valid input에 대한 success test '''
     login_data = {
@@ -20,6 +67,8 @@ def test_login_success():
     response_data = response.json()
     assert "access_token" in response_data
     assert "refresh_token" in response_data
+    assert "user" in response_data
+    assert response_data["user"]["username"] == DUMMY_USER_USERNAME
 
 
 def test_login_failure():
