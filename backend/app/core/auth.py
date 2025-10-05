@@ -4,6 +4,7 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import HTTPException
 from enum import Enum
 from .config import settings
+from .exceptions import AuthTokenExpiredException, InvalidTokenException, InvalidTokenTypeException
 
 # 패스워드 해싱용 설정
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -44,13 +45,13 @@ def verify_token(token: str, expected_type: TokenType) -> dict:
         token_type_str: str = payload.get("type")
         
         if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token: no subject")
+            raise InvalidTokenException()
         
         if token_type_str != expected_type.value:
-            raise HTTPException(status_code=401, detail=f"Invalid token type: expected {expected_type.value}, got {token_type_str}")
+            raise InvalidTokenTypeException()
             
         return {"username": username, "token_type": token_type_str, "payload": payload}
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+        raise AuthTokenExpiredException()
     except JWTError as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise InvalidTokenException()
