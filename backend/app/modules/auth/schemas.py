@@ -31,7 +31,7 @@ class TokensResponse(BaseModel):
 
 
 class SignupRequest(UserCredentials):
-    nickname: str = Field(..., min_length=1, max_length=50)
+    nickname: str = Field("", max_length=50)
 
 class SignupResponse(TokensResponse):
     pass
