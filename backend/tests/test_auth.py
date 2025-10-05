@@ -110,7 +110,8 @@ def test_delete_account_success():
         # 계정이 없으므로 새로 생성
         signup_data = {
             "username": "testuser1234",
-            "password": "testuser1234!"
+            "password": "testuser1234!",
+            "nickname": "testnick1234"
         }
         signup_response = client.post(f"{API_VERSION}/auth/signup", json=signup_data)
         assert signup_response.status_code == 201

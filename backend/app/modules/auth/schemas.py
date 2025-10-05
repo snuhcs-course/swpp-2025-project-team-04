@@ -31,7 +31,7 @@ class TokensResponse(BaseModel):
 
 
 class SignupRequest(UserCredentials):
-    pass # TODO : 회원가입 request body fields는 추후 수정 예정
+    nickname: str = Field(..., min_length=1, max_length=50)
 
 class SignupResponse(TokensResponse):
     pass
