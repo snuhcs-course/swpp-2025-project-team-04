@@ -1,26 +1,32 @@
-import { useQuery } from '@tanstack/react-query';
+import { USER_QUERY_KEY } from '@/constants/queryKeys';
+import { User } from '@/types/type';
+import { deleteRefreshToken, setAccessToken } from '@/utils/tokenManager';
+import { useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 
-function useGreeting() {
-  return useQuery({
-    queryKey: ['greeting'],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      return 'You are signed in. Build something awesome!';
-    },
-  });
-}
-
 export default function HomeScreen() {
-  const { data, isLoading } = useGreeting();
+  const queryClient = useQueryClient();
+
+  const user = queryClient.getQueryData<User | null>(USER_QUERY_KEY);
+
+  // logout
+  const handleLogout = () => {
+    setAccessToken(null);
+    deleteRefreshToken();
+    queryClient.setQueryData(USER_QUERY_KEY, null);
+  };
 
   return (
-    <View className="flex-1 items-center justify-center bg-white px-6 dark:bg-neutral-950">
-      <View className="w-full max-w-xl items-center">
-        <Text className="mb-3 text-3xl font-semibold text-neutral-900 dark:text-white">
-          Home
+    <View>
+      <Text>
+        {user ? `Welcome back, ${user.nickname}!` : 'Welcome to LingoFit!'}
+      </Text>
+      {user && (
+        <Text onPress={handleLogout} style={{ color: 'blue', marginTop: 20 }}>
+          Logout
         </Text>
-      </View>
+      )}
     </View>
   );
 }
