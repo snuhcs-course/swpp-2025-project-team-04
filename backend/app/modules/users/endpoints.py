@@ -41,13 +41,13 @@ def read_users(skip: int = 0, limit: int = 100):
 
 
 @router.get("/me", response_model=schemas.User,
-             responses=AppException.to_openapi_examples([
-                 InvalidAuthHeaderException,
-                 UserNotFoundException,
-                 AuthTokenExpiredException,
-                 InvalidTokenException,
-                 InvalidTokenTypeException
-             ]))
+            responses=AppException.to_openapi_examples([
+                InvalidAuthHeaderException,
+                UserNotFoundException,
+                AuthTokenExpiredException,
+                InvalidTokenException,
+                InvalidTokenTypeException
+            ]))
 def get_me(current_user = Depends(get_current_user)):
     return {
         "id": current_user.id,

@@ -23,11 +23,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/signup", response_model=SignupResponse, status_code=201, 
-             responses=AppException.to_openapi_examples([
-                 UsernameExistsException,
-                 InvalidUsernameFormatException,
-                 InvalidPasswordFormatException
-             ]))
+            responses=AppException.to_openapi_examples([
+                UsernameExistsException,
+                InvalidUsernameFormatException,
+                InvalidPasswordFormatException
+            ]))
 def signup(request: SignupRequest, db: Session = Depends(get_db)):
     # username 중복 체크
     if get_user_by_username(db, request.username):
@@ -49,12 +49,12 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=LoginResponse, 
-             responses=AppException.to_openapi_examples([
-                 UserNotFoundException,
-                 InvalidCredentialsException,
-                 InvalidUsernameFormatException,
-                 InvalidPasswordFormatException
-             ]))
+            responses=AppException.to_openapi_examples([
+                UserNotFoundException,
+                InvalidCredentialsException,
+                InvalidUsernameFormatException,
+                InvalidPasswordFormatException
+            ]))
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     # 사용자 조회
     user = get_user_by_username(db, request.username)
@@ -78,12 +78,12 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/refresh/access", response_model=AccessTokenResponse, 
-             responses=AppException.to_openapi_examples([
-                 UserNotFoundException,
-                 AuthTokenExpiredException,
-                 InvalidTokenException,
-                 InvalidTokenTypeException
-             ]))
+            responses=AppException.to_openapi_examples([
+                UserNotFoundException,
+                AuthTokenExpiredException,
+                InvalidTokenException,
+                InvalidTokenTypeException
+            ]))
 def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     # refresh token 검증
     token_data = verify_token(request.refresh_token, TokenType.REFRESH_TOKEN)
@@ -103,14 +103,14 @@ def reissue_access_token(request: RefreshTokenRequest, db: Session = Depends(get
 
 
 @router.delete("/delete-account", response_model=DeleteAccountResponse,
-               responses=AppException.to_openapi_examples([
-                   InvalidAuthHeaderException,
-                   UserNotFoundException,
-                   AuthTokenExpiredException,
-                   InvalidTokenException,
-                   InvalidTokenTypeException,
-                   AccountDeletionFailedException
-               ]))
+                responses=AppException.to_openapi_examples([
+                    InvalidAuthHeaderException,
+                    UserNotFoundException,
+                    AuthTokenExpiredException,
+                    InvalidTokenException,
+                    InvalidTokenTypeException,
+                    AccountDeletionFailedException
+                ]))
 def delete_account(authorization: str = Header(), db: Session = Depends(get_db)):
     # Bearer 토큰에서 access token 추출
     if not authorization.startswith("Bearer "):
