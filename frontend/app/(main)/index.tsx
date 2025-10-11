@@ -23,9 +23,16 @@ export default function HomeScreen() {
         {user ? `Welcome back, ${user.nickname}!` : 'Welcome to LingoFit!'}
       </Text>
       {user && (
-        <Text onPress={handleLogout} style={{ color: 'blue', marginTop: 20 }}>
-          Logout
-        </Text>
+        <>
+          <Text onPress={handleLogout} style={{ color: 'blue', marginTop: 20 }}>
+            Logout
+          </Text>
+
+          {/* (for testing) button that leads to the survey page */}
+          <Text onPress={() => router.push('/(main)/initial-survey')} style={{ color: 'blue', marginTop: 20 }}> 
+            Survey
+          </Text>
+        </>
       )}
     </View>
   );
