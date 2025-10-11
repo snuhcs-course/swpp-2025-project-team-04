@@ -1,11 +1,18 @@
-import {useState} from 'react';
-import {View, Text, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
-import {router} from 'expo-router';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import Slider from '@react-native-community/slider';
 
 export default function InitialSurveyScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const [userInput, setUserInput] = useState({
     proficiencyLevel: '',
+    percent1: 50,
+    percent2: 50,
+    percent3: 50,
+    percent4: 50,
+    percent5: 50,
+    selectedTopics: [] as string[],
   });
 
   const totalPages = 7;
@@ -17,6 +24,58 @@ export default function InitialSurveyScreen() {
     { id: '4', title: '(B2) 자연스러운 대화 가능' },
     { id: '5', title: '(C1) 전문적인 이해' },
     { id: '6', title: '(C2) 원어민 수준' }
+  ];
+
+  const topicCategories = [
+    {
+      category: '시사·뉴스',
+      topics: [
+        { id: '정치', label: '🏛️ 정치' },
+        { id: '경제', label: '💰 경제' },
+        { id: '사회', label: '👥 사회' },
+        { id: '국제', label: '🌍 국제' },
+        { id: '기술 트렌드', label: '🚀 기술 트렌드' }
+      ]
+    },
+    {
+      category: '라이프스타일',
+      topics: [
+        { id: '여행', label: '✈️ 여행' },
+        { id: '음식', label: '🍴 음식' },
+        { id: '건강', label: '💪 건강' },
+        { id: '자기계발', label: '📈 자기계발' },
+        { id: '재테크', label: '💵 재테크' }
+      ]
+    },
+    {
+      category: '문화·엔터테인먼트',
+      topics: [
+        { id: '영화/드라마', label: '🎬 영화/드라마' },
+        { id: '음악', label: '🎵 음악' },
+        { id: '스포츠', label: '⚽ 스포츠' },
+        { id: '게임', label: '🎮 게임' },
+        { id: '예술', label: '🎨 예술' }
+      ]
+    },
+    {
+      category: '지식·교육',
+      topics: [
+        { id: '과학', label: '🔬 과학' },
+        { id: '역사', label: '📜 역사' },
+        { id: '철학', label: '💭 철학' },
+        { id: '심리학', label: '🧠 심리학' },
+        { id: 'IT/AI', label: '🤖 IT/AI' },
+        { id: '언어 학습', label: '📚 언어 학습' }
+      ]
+    },
+    {
+      category: '개인 경험·스토리',
+      topics: [
+        { id: '에세이', label: '✍️ 에세이' },
+        { id: '인터뷰', label: '🎤 인터뷰' },
+        { id: '일상 이야기', label: '💬 일상 이야기' }
+      ]
+    }
   ];
 
   const handleNext = () => {
@@ -35,6 +94,56 @@ export default function InitialSurveyScreen() {
 
   const handleSubmit = () => {
     router.replace('/(main)');
+  };
+
+  const handleTopicToggle = (topic: string) => {
+    const currentTopics = userInput.selectedTopics;
+    if (currentTopics.includes(topic)) {// Remove if already selected
+      setUserInput({
+        ...userInput,
+        selectedTopics: currentTopics.filter(t => t !== topic)
+      });
+    } else if (currentTopics.length < 3) {// Add if less than 3 selected
+      setUserInput({
+        ...userInput,
+        selectedTopics: [...currentTopics, topic]
+      });
+    }
+  };
+
+  const useSlider = (
+    percentKey: 'percent1' | 'percent2' | 'percent3' | 'percent4' | 'percent5',
+    fileNumber: number
+  ) => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.tempText}>listening file {fileNumber}</Text>
+
+        <View style={styles.sliderContainer}>
+          <Text style={styles.sliderQuestion}>
+            들은 내용 중 몇 %를 이해했는지 솔직하게 평가해 주세요.
+          </Text>
+
+          <View style={styles.sliderWrapper}>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={100}
+              step={10}
+              value={userInput[percentKey]}
+              onValueChange={(value) => {
+                setUserInput({ ...userInput, [percentKey]: value });
+              }}
+              minimumTrackTintColor="#6FA4D7"
+              maximumTrackTintColor="#e0e0e0"
+              thumbTintColor="#6FA4D7"
+            />
+
+            <Text style={styles.sliderValue}>{userInput[percentKey]}%</Text>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   const renderStep = () => {
@@ -88,39 +197,52 @@ export default function InitialSurveyScreen() {
           </View>
         );
       case 2:
-        return (
-          <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>listening file 1</Text>
-          </View>
-        );
+        return useSlider('percent1', 1);
       case 3:
-        return (
-          <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>listening file 2</Text>
-          </View>
-        );
+        return useSlider('percent2', 2);
       case 4:
-        return (
-          <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>listening file 3</Text>
-          </View>
-        );
+        return useSlider('percent3', 3);
       case 5:
-        return (
-          <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>listening file 4</Text>
-          </View>
-        );
+        return useSlider('percent4', 4);
       case 6:
-        return (
-          <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>listening file 5</Text>
-          </View>
-        );
+        return useSlider('percent5', 5);
       case 7:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.tempText}>Final Page</Text>
+            <Text style={styles.topicTitle}>가장 관심 있는 주제를 선택해주세요</Text>
+            <Text style={styles.topicSubtitle}>(최대 3개)</Text>
+
+            {topicCategories.map((categoryData, index) => (
+              <View key={index} style={styles.categoryContainer}>
+                <Text style={styles.categoryHeader}>{categoryData.category}</Text>
+                <View style={styles.topicsGrid}>
+                  {categoryData.topics.map((topic) => {
+                    const isSelected = userInput.selectedTopics.includes(topic.id);
+                    return (
+                      <TouchableOpacity
+                        key={topic.id}
+                        style={[
+                          styles.topicButton,
+                          isSelected && styles.topicButtonSelected,
+                        ]}
+                        onPress={() => handleTopicToggle(topic.id)}
+                      >
+                        <Text style={[
+                          styles.topicButtonText,
+                          isSelected && styles.topicButtonTextSelected
+                        ]}>
+                          {topic.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+
+            <Text style={styles.topicCounter}>
+              {userInput.selectedTopics.length}/3 선택됨
+            </Text>
           </View>
         );
       default:
@@ -319,5 +441,87 @@ const styles = StyleSheet.create({
   },
   levelTitleSelected: {
     color: '#6FA4D7',
+  },
+  sliderContainer: {
+    marginTop: 40,
+    paddingHorizontal: 8,
+  },
+  sliderQuestion: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 40,
+    lineHeight: 28,
+  },
+  sliderWrapper: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  sliderValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#6FA4D7',
+    marginTop: 20,
+  },
+  topicTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+    lineHeight: 30,
+  },
+  topicSubtitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 19,
+    textAlign: 'center',
+  },
+  categoryContainer: {
+    marginBottom: 24,
+  },
+  categoryHeader: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 12,
+  },
+  topicsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  topicButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+  },
+  topicButtonSelected: {
+    borderColor: '#6FA4D7',
+    backgroundColor: '#6FA4D7',
+  },
+  topicButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
+  topicButtonTextSelected: {
+    color: '#fff',
+  },
+  topicCounter: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6FA4D7',
+    textAlign: 'center',
+    marginTop: 16,
   },
 });
