@@ -1,4 +1,7 @@
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 APP_NAME = "VoxCPM TTS API"
 HOST = "0.0.0.0"
