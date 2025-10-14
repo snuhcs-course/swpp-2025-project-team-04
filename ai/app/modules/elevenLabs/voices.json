@@ -1,0 +1,202 @@
+{
+    "voices": [
+      {
+        "voice_id": "NOpBlnGInO9m6vDvFkFC",
+        "name": "Grandpa Spuds Oxley",
+        "tags": {
+          "gender": "male",
+          "age": "senior",
+          "accent": "none",
+          "style": "storyteller",
+          "use_case": ["storytelling", "character_voice", "audiobook"]
+        }
+      },
+      {
+        "voice_id": "Z3R5wn05IrDiVCyEkUrK",
+        "name": "Arabella",
+        "tags": {
+          "gender": "female",
+          "age": "young_adult",
+          "accent": "none",
+          "style": "emotive",
+          "use_case": ["fantasy", "romance", "wellness", "narration"]
+        }
+      },
+      {
+        "voice_id": "Bj9UqZbhQsanLzgalpEG",
+        "name": "Austin",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "american_southern",
+          "style": "conversational",
+          "use_case": ["character_voice", "dialogue_practice"]
+        }
+      },
+      {
+        "voice_id": "NNl6r8mD7vthiJatiJt1",
+        "name": "Bradford",
+        "tags": {
+          "gender": "male",
+          "age": "middle_aged",
+          "accent": "british",
+          "style": "storyteller",
+          "use_case": ["storytelling", "audiobook", "narration"]
+        }
+      },
+      {
+        "voice_id": "EkK5I93UQWFDigLMpZcX",
+        "name": "James",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "american_standard",
+          "style": "husky",
+          "use_case": ["audiobook", "narration", "professional_voiceover"]
+        }
+      },
+      {
+        "voice_id": "exsUS4vynmxd379XN4yO",
+        "name": "Blondie",
+        "tags": {
+          "gender": "female",
+          "age": "young_adult",
+          "accent": "british",
+          "style": "conversational",
+          "use_case": ["dialogue_practice", "storytelling", "narration"]
+        }
+      },
+      {
+        "voice_id": "RILOU7YmBhvwJGDGjNmP",
+        "name": "Jane",
+        "tags": {
+          "gender": "female",
+          "age": "middle_aged",
+          "accent": "none",
+          "style": "professional",
+          "use_case": ["audiobook", "narration", "content_creation"]
+        }
+      },
+      {
+        "voice_id": "19STyYD15bswVz51nqLf",
+        "name": "Samara X",
+        "tags": {
+          "gender": "female",
+          "age": "middle_aged",
+          "accent": "british",
+          "style": "elegant",
+          "use_case": ["podcast", "explaining", "narration", "motivational"]
+        }
+      },
+      {
+        "voice_id": "kdmDKE6EkgrWrrykO9Qt",
+        "name": "Alexandra",
+        "tags": {
+          "gender": "female",
+          "age": "young_adult",
+          "accent": "none",
+          "style": "conversational",
+          "use_case": ["dialogue_practice", "podcast", "social_media"]
+        }
+      },
+      {
+        "voice_id": "aMSt68OGf4xUZAnLpTU8",
+        "name": "Juniper",
+        "tags": {
+          "gender": "female",
+          "age": "adult",
+          "accent": "none",
+          "style": "professional",
+          "use_case": ["podcast", "conversation", "professional_voiceover"]
+        }
+      },
+      {
+        "voice_id": "DTKMou8ccj1ZaWGBiotd",
+        "name": "Jamahal",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "american_urban",
+          "style": "chill",
+          "use_case": ["podcast", "dialogue_practice"]
+        }
+      },
+      {
+        "voice_id": "wo6udizrrtpIxWGp2qJk",
+        "name": "Northern Terry",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "british_northern",
+          "style": "quirky",
+          "use_case": ["games", "animation", "character_voice"]
+        }
+      },
+      {
+        "voice_id": "TmNe0cCqkZBMwPWOd3RD",
+        "name": "KW Smith",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "none",
+          "style": "mellow",
+          "use_case": ["podcast", "character_voice", "narration"]
+        }
+      },
+      {
+        "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+        "name": "Finn",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "none",
+          "style": "conversational",
+          "use_case": ["podcast", "dialogue_practice"]
+        }
+      },
+      {
+        "voice_id": "c6SfcYrb2t09NHXiT80T",
+        "name": "Jarnathan",
+        "tags": {
+          "gender": "male",
+          "age": "middle_aged",
+          "accent": "american_standard",
+          "style": "versatile",
+          "use_case": ["narration", "e-learning", "commercial", "dramatic_reading"]
+        }
+      },
+      {
+        "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+        "name": "Callum",
+        "tags": {
+          "gender": "male",
+          "age": "middle_aged",
+          "accent": "none",
+          "style": "gravelly",
+          "use_case": ["character_voice", "thriller", "games"]
+        }
+      },
+      {
+        "voice_id": "cgSgspJ2msm6clMCkdW9",
+        "name": "Jessica",
+        "tags": {
+          "gender": "female",
+          "age": "young_adult",
+          "accent": "american_standard",
+          "style": "playful",
+          "use_case": ["social_media", "commercial", "young_content"]
+        }
+      },
+      {
+        "voice_id": "gs0tAILXbY5DNrJrsM6F",
+        "name": "Jeff",
+        "tags": {
+          "gender": "male",
+          "age": "young_adult",
+          "accent": "none",
+          "style": "resonant",
+          "use_case": ["podcast", "narration", "professional_voiceover"]
+        }
+      }
+    ]
+  }
