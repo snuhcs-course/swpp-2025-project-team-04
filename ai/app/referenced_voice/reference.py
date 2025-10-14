@@ -1,6 +1,5 @@
 import os
 
-# 현재 py 파일이 있는 디렉터리 경로
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SPEAKER_REFERENCES = {
