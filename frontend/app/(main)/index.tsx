@@ -64,7 +64,7 @@ export default function HomeScreen() {
         <Button
           title="Generate Audio"
           onPress={() => {
-            router.push('/lyric');
+            router.push('/audio');
           }}
           style={{ width: '100%' }}
         />
