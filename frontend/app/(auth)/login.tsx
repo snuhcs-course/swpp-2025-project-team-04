@@ -1,4 +1,5 @@
 import { useLogin } from '@/hooks/mutations/useAuthMutations';
+import { validatePassword, validateUsername } from '@/utils/authValidation';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -19,8 +20,11 @@ export default function LoginScreen() {
   const loginMutation = useLogin();
 
   const handleSubmit = () => {
-    if (!username || !password) {
-      setErrorMessage('Please enter both an ID and password.');
+    const usernameError = validateUsername(username);
+    const passwordError = validatePassword(password);
+
+    if (usernameError || passwordError) {
+      setErrorMessage(usernameError || passwordError);
       return;
     }
 
@@ -61,7 +65,7 @@ export default function LoginScreen() {
               textContentType="username"
               placeholder="your id"
               placeholderTextColor="#9ca3af"
-              className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+              className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
               editable={!loginMutation.isPending}
             />
           </View>
@@ -77,7 +81,7 @@ export default function LoginScreen() {
               textContentType="password"
               placeholder="••••••••"
               placeholderTextColor="#9ca3af"
-              className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+              className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
               editable={!loginMutation.isPending}
             />
           </View>

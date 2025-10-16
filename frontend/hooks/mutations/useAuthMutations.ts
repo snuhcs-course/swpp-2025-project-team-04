@@ -8,6 +8,7 @@ import {
 } from '@/utils/tokenManager';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
 
 export const useSignup = () => {
   const queryClient = useQueryClient();
@@ -48,7 +49,9 @@ export const useLogin = () => {
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
-  setAccessToken(null);
-  deleteRefreshToken();
-  queryClient.setQueryData(USER_QUERY_KEY, null);
+  return useCallback(async () => {
+    setAccessToken(null);
+    await deleteRefreshToken();
+    queryClient.setQueryData<User | null>(USER_QUERY_KEY, null);
+  }, [queryClient]);
 };
