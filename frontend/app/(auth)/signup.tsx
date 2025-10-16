@@ -66,7 +66,7 @@ export default function SignUpScreen() {
                 onChangeText={setNickname}
                 placeholder="your nickname"
                 placeholderTextColor="#9ca3af"
-                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900  focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
                 editable={!signupMutation.isPending}
               />
             </View>
@@ -82,7 +82,7 @@ export default function SignUpScreen() {
                 textContentType="username"
                 placeholder="your id"
                 placeholderTextColor="#9ca3af"
-                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900  focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
                 editable={!signupMutation.isPending}
               />
             </View>
@@ -98,7 +98,7 @@ export default function SignUpScreen() {
                 textContentType="newPassword"
                 placeholder="At least 8 characters"
                 placeholderTextColor="#9ca3af"
-                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-neutral-900 focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-neutral-900 dark:text-white"
                 editable={!signupMutation.isPending}
               />
             </View>
