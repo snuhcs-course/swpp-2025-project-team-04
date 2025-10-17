@@ -18,6 +18,10 @@ CEFR_LEVEL_DESCRIPTIONS = {
 UnderstandingScore = Annotated[int, Ge(0), Le(100)]
 TestsField = Annotated[List["LevelTestItem"], Len(min_length=1, max_length=5)]
 
+class LevelScores(BaseModel):
+    level_score: UnderstandingScore
+    llm_confidence: UnderstandingScore
+
 
 class LevelTestItem(BaseModel):
     script_id: str = Field(..., max_length=64)
@@ -38,3 +42,6 @@ class LevelTestRequest(BaseModel):
 class LevelTestResponse(BaseModel):
     level: CEFRLevel
     level_description: str
+    scores: LevelScores
+    rationale: str = Field(..., max_length=2048)
+    updated_at: datetime
