@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic_settings import BaseSettings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,8 @@ class Settings(BaseSettings):
     db_host: str
     db_name: str
     secret_key: str
+    openai_api_key: Optional[str] = None
+    openai_base_url: Optional[str] = None
 
     class Config:
         env_file = "backend/.env"
