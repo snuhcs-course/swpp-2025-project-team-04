@@ -42,7 +42,7 @@ Key requirements include:
 2.  **Check out the demo branch**
 
     ```sh
-    git checkout iteration-1-demo
+    git checkout iteration-2-demo
     ```
 
 3.  **Navigate to the project directory**
