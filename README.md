@@ -5,6 +5,7 @@ LingoFit is an AI-based learning tool designed to improve English listening comp
 ## Demo Video
 
 [LingoFit Iteration 1 Demo Video (Youtube)](https://youtube.com/shorts/NZtx5q3hY98?feature=share)
+
 [LingoFit Iteration 2 Demo Video (Youtube)](https://youtube.com/shorts/E36M5oZ0y3Y?feature=share)
 
 ## Implemented Features
