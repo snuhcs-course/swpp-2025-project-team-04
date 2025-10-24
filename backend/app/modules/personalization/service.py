@@ -97,6 +97,35 @@ class PersonalizationService:
             updated_at=user_record.level_updated_at,
         )
 
+    def set_manual_level(
+        self,
+        *,
+        db: Session,
+        user: User,
+        payload: schemas.ManualLevelUpdateRequest,
+    ) -> schemas.ManualLevelUpdateResponse:
+        user_record = user_crud.update_user_level(
+            db,
+            user_id=user.id,
+            level=payload.level,
+            commit=False,
+        )
+        history_record = crud.insert_level_history(
+            db,
+            user_id=user.id,
+            level=payload.level,
+        )
+
+        db.commit()
+        db.refresh(user_record)
+        db.refresh(history_record)
+
+        return schemas.ManualLevelUpdateResponse(
+            level=payload.level,
+            level_description=schemas.CEFR_LEVEL_DESCRIPTIONS[payload.level],
+            updated_at=user_record.level_updated_at,
+        )
+
     def _summarize_level_test(
         self,
         *,

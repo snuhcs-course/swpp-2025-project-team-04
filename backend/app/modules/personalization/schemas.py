@@ -45,3 +45,13 @@ class LevelTestResponse(BaseModel):
     scores: LevelScores
     rationale: str = Field(..., max_length=2048)
     updated_at: datetime
+
+
+class ManualLevelUpdateRequest(BaseModel):
+    level: CEFRLevel
+
+
+class ManualLevelUpdateResponse(BaseModel):
+    level: CEFRLevel
+    level_description: str
+    updated_at: datetime
