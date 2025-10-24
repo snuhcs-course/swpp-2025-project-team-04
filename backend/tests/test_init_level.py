@@ -1,12 +1,15 @@
 import json
+from datetime import datetime, timezone
+from types import SimpleNamespace
 from typing import Dict
 
 import pytest
 
 from app.core.llm import LLMServiceError
-from app.modules.personalization import schemas
+from app.modules.personalization import crud, schemas
 from app.modules.personalization.models import CEFRLevel, LevelTestScript
 from app.modules.personalization.service import PersonalizationService
+from app.modules.users import crud as user_crud
 
 
 class FakePrompt:
@@ -122,3 +125,52 @@ def test_summarize_level_test_invalid_llm_payload_uses_defaults():
     assert result.level_score == 28  # A2 구간 중간값
     assert result.llm_confidence == 0  # clamp 결과
     assert result.rationale == "평가 근거가 제공되지 않았습니다."
+
+
+class DummySession:
+    def __init__(self):
+        self.commits = 0
+        self.refreshed = []
+
+    def commit(self):
+        self.commits += 1
+
+    def refresh(self, obj):
+        self.refreshed.append(obj)
+
+
+def test_set_manual_level_updates_user_and_history(monkeypatch):
+    db = DummySession()
+    user = SimpleNamespace(id=42)
+    updated_at = datetime.now(timezone.utc)
+
+    def fake_update_user_level(db_arg, *, user_id, level, commit):
+        assert db_arg is db
+        assert user_id == user.id
+        assert level == CEFRLevel.B2
+        assert commit is False
+        return SimpleNamespace(
+            id=user_id,
+            level=level,
+            level_updated_at=updated_at,
+        )
+
+    def fake_insert_level_history(db_arg, *, user_id, level):
+        assert db_arg is db
+        assert user_id == user.id
+        assert level == CEFRLevel.B2
+        return SimpleNamespace(user_id=user_id, level=level)
+
+    monkeypatch.setattr(user_crud, "update_user_level", fake_update_user_level)
+    monkeypatch.setattr(crud, "insert_level_history", fake_insert_level_history)
+
+    service = PersonalizationService()
+    payload = schemas.ManualLevelUpdateRequest(level=CEFRLevel.B2)
+
+    response = service.set_manual_level(db=db, user=user, payload=payload)
+
+    assert db.commits == 1
+    assert len(db.refreshed) == 2
+    assert response.level == CEFRLevel.B2
+    assert response.level_description == schemas.CEFR_LEVEL_DESCRIPTIONS[CEFRLevel.B2]
+    assert response.updated_at == updated_at
