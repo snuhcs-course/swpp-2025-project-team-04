@@ -8,13 +8,18 @@ LingoFit is an AI-based learning tool designed to improve English listening comp
 
 [LingoFit Iteration 2 Demo Video (Youtube)](https://youtube.com/shorts/E36M5oZ0y3Y?feature=share)
 
+[LingoFit Iteration 3 Demo Video (Youtube)](https://youtube.com/shorts/iPv2uiqF1O0?si=S59XPjY_LWDO_z9_)
+
 ## Implemented Features
 
   - User authentication (Sign Up, Log In, Log Out)
-  - Header, footer, and navigation
-  - Level initialization page (backend: in progress)
-  - Main page (backend: in progress)
-  - Audio page (backend: in progress)
+  - Level initialization
+  - Audio generation
+  - Audio session
+  - Audio Difficulty Feedback
+  - Vocab (with fake data)
+  - Stat
+  - Profile
 
 ## Getting Started
 
@@ -67,7 +72,7 @@ Key requirements include:
 6.  **Start the development server**
 
     ```sh
-    npx expo start
+    npx expo run:android
     ```
 
     After running the command, a QR code will appear in the terminal. Scan it with the Expo Go app on your phone, or press `a` or `i` to launch the Android Emulator or iOS Simulator.
