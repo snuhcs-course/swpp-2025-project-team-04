@@ -4,13 +4,15 @@ import { useUser } from '@/hooks/queries/useUserQueries';
 import { QueryProvider } from '@/lib/QueryProvider';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import 'react-native-reanimated';
 export { ErrorBoundary } from 'expo-router';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import TrackPlayer, { Capability } from 'react-native-track-player';
 import { PlaybackService } from './PlaybackService';
+import SplashScreenComponent from '@/components/SplashScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -60,29 +62,30 @@ export default function RootLayout() {
 
 function RootNavigation() {
   const { data: user, isLoading: isAuthLoading } = useUser();
+  const [showCustomSplash, setShowCustomSplash] = useState(true);
 
   useEffect(() => {
-    let didHide = false;
-    if (!isAuthLoading) {
-      const start = Date.now();
-      const hide = async () => {
-        const elapsed = Date.now() - start;
-        const remaining = Math.max(0, 1000 - elapsed);
-        setTimeout(async () => {
-          if (!didHide) {
-            await SplashScreen.hideAsync();
-            didHide = true;
-          }
-        }, remaining);
-      };
-      hide();
-    }
-    return () => {
-      didHide = true;
-    };
-  }, [isAuthLoading]);
+    // Hide native splash immediately when app loads
+    SplashScreen.hideAsync();
+  }, []);
 
-  if (isAuthLoading) return null;
+  const handleSplashAnimationComplete = () => {
+    setShowCustomSplash(false);
+  };
+
+  // Show custom splash for fixed duration regardless of loading state
+  if (showCustomSplash) {
+    return <SplashScreenComponent onAnimationComplete={handleSplashAnimationComplete} />;
+  }
+
+  // Show loading indicator if still loading after splash
+  if (isAuthLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-[#EBF4FB]">
+        <ActivityIndicator size="large" color="#0EA5E9" />
+      </View>
+    );
+  }
 
   return (
     <Stack>
