@@ -5,7 +5,8 @@ import { TOPIC_CATEGORIES } from '@/constants/initialSurveyData';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useGenerateAudio } from '@/hooks/mutations/useAudioMutations';
+import { useGenerateAudio, useGenerateAudioWithWebSocket } from '@/hooks/mutations/useAudioMutations';
+import AudioGenerationProgress from '@/components/audio/AudioGenerationProgress';
 import { useQueryClient } from '@tanstack/react-query';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -57,7 +58,10 @@ export default function HomeScreen() {
     }, [generateDisplayedThemes]),
   );
 
-  // 오디오 API 훅
+  // WebSocket 오디오 생성 훅
+  const audioWebSocket = useGenerateAudioWithWebSocket();
+  
+  // Legacy HTTP 훅 (fallback용으로 유지)
   const { mutate: audioMutate, isPending: isAudioLoading } = useGenerateAudio();
 
   // 상단 안내 문구
@@ -94,33 +98,80 @@ export default function HomeScreen() {
       return;
     }
 
-    audioMutate(
+    // WebSocket을 통한 오디오 생성
+    audioWebSocket.generateAudio(
       { mood: selectedMood, theme: selectedTheme },
-      {
-        onSuccess: async (data) => {
-          try {
-            // RNTP 트랙 세팅
-            await TrackPlayer.reset();
-            await TrackPlayer.add({
-              url: `${baseURL}${data.audio_url}`,
-              title: data.title,
-              artist: 'LingoFit',
-            });
+      async (data) => {
+        try {
+          // RNTP 트랙 세팅
+          await TrackPlayer.reset();
+          await TrackPlayer.add({
+            url: data.audio_url,
+            title: data.title,
+            artist: 'LingoFit',
+          });
 
-            // 세션 ID 생성 후 캐시에 원본 응답 저장
-            const id = uuidv4();
-            qc.setQueryData(['audio', id], data);
+          // 세션 ID 생성 후 캐시에 원본 응답 저장
+          const id = uuidv4();
+          
+          // AudioGenerationResult를 AudioGenerationResponse 형식으로 변환
+          const responseData = {
+            title: data.title,
+            audio_url: data.audio_url,
+            sentences: data.sentences.map(sentence => ({
+              id: Math.random().toString(), // 임시 ID 생성
+              start_time: sentence.start_time.toString(),
+              text: sentence.text,
+            })),
+          };
+          
+          qc.setQueryData(['audio', id], responseData);
 
-            // 플레이어 화면으로 라우팅 (id만 전달)
+          // 프로그레스 모달 닫기를 위한 딜레이
+          setTimeout(() => {
             router.push(`/audioPlayer/${id}`);
-          } catch (e) {
-            console.error('TrackPlayer 처리 중 오류:', e);
-          }
-        },
-        onError: (error) => {
-          console.error('오디오 생성 실패:', error);
-        },
-      },
+          }, 1000);
+        } catch (e) {
+          console.error('TrackPlayer 처리 중 오류:', e);
+        }
+      }
+    );
+  };
+  
+  const handleRetryGeneration = () => {
+    if (!selectedTheme || !selectedMood) return;
+    
+    audioWebSocket.retryGeneration(
+      { mood: selectedMood, theme: selectedTheme },
+      async (data) => {
+        try {
+          await TrackPlayer.reset();
+          await TrackPlayer.add({
+            url: data.audio_url,
+            title: data.title,
+            artist: 'LingoFit',
+          });
+
+          const id = uuidv4();
+          const responseData = {
+            title: data.title,
+            audio_url: data.audio_url,
+            sentences: data.sentences.map(sentence => ({
+              id: Math.random().toString(),
+              start_time: sentence.start_time.toString(),
+              text: sentence.text,
+            })),
+          };
+          
+          qc.setQueryData(['audio', id], responseData);
+          
+          setTimeout(() => {
+            router.push(`/audioPlayer/${id}`);
+          }, 1000);
+        } catch (e) {
+          console.error('TrackPlayer 처리 중 오류:', e);
+        }
+      }
     );
   };
 
@@ -211,14 +262,29 @@ export default function HomeScreen() {
 
           <View className="mt-6">
             <Button
-              title={isAudioLoading ? '생성 중...' : '오디오 생성하기'}
+              title={audioWebSocket.isGenerating ? '생성 중...' : '오디오 생성하기'}
               onPress={handleGenerateAudio}
-              disabled={isAudioLoading}
+              disabled={audioWebSocket.isGenerating || !selectedTheme || !selectedMood}
               style={{ width: '100%' }}
             />
           </View>
         </View>
       </ScrollView>
+
+      {/* WebSocket 오디오 생성 프로그레스 모달 */}
+      <AudioGenerationProgress
+        visible={audioWebSocket.isGenerating || !!audioWebSocket.error}
+        step={audioWebSocket.currentStep}
+        message={audioWebSocket.currentMessage}
+        percentage={audioWebSocket.currentPercentage}
+        isConnected={audioWebSocket.isConnected}
+        error={audioWebSocket.error}
+        onCancel={() => {
+          audioWebSocket.cancelGeneration();
+          audioWebSocket.clearError();
+        }}
+        onRetry={audioWebSocket.error ? handleRetryGeneration : undefined}
+      />
     </View>
   );
 }
