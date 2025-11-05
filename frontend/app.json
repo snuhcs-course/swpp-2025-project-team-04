@@ -38,11 +38,6 @@
     "experiments": {
       "typedRoutes": true
     },
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#6FA4D7"
-    },
     "icon": "./assets/icon.png"
   }
 }
