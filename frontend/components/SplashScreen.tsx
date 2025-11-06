@@ -111,7 +111,7 @@ export default function SplashScreen({ onAnimationComplete }: SplashScreenProps)
           className="text-lg font-medium text-white/90"
           style={{ opacity: fadeAnim }}
         >
-          English Listening
+          PROFESSIONAL LEARNING MADE SIMPLE
         </Animated.Text>
         
         <Animated.View
