@@ -20,7 +20,7 @@ LingoFit is an AI-based learning tool designed to improve English listening comp
   - Audio generation
   - Audio session
   - Audio Difficulty Feedback
-  - Vocab (with fake data)
+  - Vocab
   - Stat
   - Profile
 
