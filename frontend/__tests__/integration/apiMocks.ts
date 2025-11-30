@@ -33,15 +33,17 @@ export const mockApiResponses = {
       id: 1,
       word: 'apple',
       meaning: '사과',
-      example: 'I like apples.',
-      level: 'beginner',
+      example_sentence: 'I like apples.',
+      example_sentence_url: 'https://example.com/audio/apple.mp3',
+      pos: 'noun',
     },
     {
       id: 2,
       word: 'book',
       meaning: '책',
-      example: 'This is a good book.',
-      level: 'beginner',
+      example_sentence: 'This is a good book.',
+      example_sentence_url: 'https://example.com/audio/book.mp3',
+      pos: 'noun',
     },
   ],
   stats: {
@@ -90,6 +92,15 @@ export function setupApiMocks() {
     },
     mockGetVocabSuccess: () => {
       mockCustomFetch.mockResolvedValueOnce(mockApiResponses.vocabList);
+    },
+    mockGetVocabEmpty: () => {
+      mockCustomFetch.mockResolvedValueOnce([]);
+    },
+    mockGetVocabFailure: (message = 'Failed to fetch vocabulary') => {
+      mockCustomFetch.mockRejectedValueOnce(new Error(message));
+    },
+    mockDeleteVocabSuccess: () => {
+      mockCustomFetch.mockResolvedValueOnce({ success: true });
     },
     mockGetStatsSuccess: () => {
       mockCustomFetch.mockResolvedValueOnce(mockApiResponses.stats);

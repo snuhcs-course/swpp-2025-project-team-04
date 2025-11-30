@@ -5,6 +5,10 @@ jest.mock('expo-router', () => ({
     back: jest.fn(),
   })),
   useLocalSearchParams: jest.fn(() => ({})),
+  useFocusEffect: jest.fn((callback) => {
+    const cleanup = callback();
+    if (cleanup) return cleanup;
+  }),
   router: {
     push: jest.fn(),
     replace: jest.fn(),
@@ -14,6 +18,7 @@ jest.mock('expo-router', () => ({
   Link: jest.fn(),
   Stack: {
     Screen: jest.fn(),
+    Protected: jest.fn(),
   },
 }));
 
