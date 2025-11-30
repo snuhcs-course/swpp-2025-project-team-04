@@ -54,7 +54,7 @@ Key requirements include:
 2.  **Check out the demo branch**
 
     ```sh
-    git checkout iteration-4-demo
+    git checkout iteration-5-demo
     ```
 
 3.  **Navigate to the frontend directory**
@@ -122,11 +122,23 @@ Key requirements include:
 
 ## Troubleshooting
 
-For detailed troubleshooting and build issues, see the [Frontend Build Guide](frontend/README.md).
+**Build fails after npm install:**
+- Did you patch the react-native-track-player file?
+- Is your Node version correct? Run `nvm use` in the frontend directory
 
-Common issues:
+**SDK not found errors:**
+- Check that `frontend/android/local.properties` exists with the correct SDK path
+- Verify the path in Android Studio → Preferences → Android SDK
 
-- **Build fails after npm install:** Make sure you patched the react-native-track-player file and are using the correct Node version (`nvm use`)
-- **SDK not found:** Check that `local.properties` exists with the correct SDK path
-- **Gradle errors:** Verify Java version is 17.0.16 (`java -version`)
-- **Can't find emulator:** Open Android Studio → Device Manager and start an emulator first
+**Gradle/Kotlin build errors:**
+- Verify Java version is 17.0.16 LTS: `java -version`
+- Try cleaning the build: `cd frontend/android && ./gradlew clean && cd ../..`
+
+**Can't find emulator:**
+- Open Android Studio → Device Manager
+- Create and start an emulator before running `npm run android`
+
+**Still broken:**
+- Delete node_modules and reinstall: `cd frontend && rm -rf node_modules && npm install`
+- Make sure you're on the correct branch
+- Double-check all environment variables in `.env`
