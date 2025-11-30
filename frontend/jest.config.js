@@ -25,11 +25,7 @@ module.exports = {
     '**/__tests__/**/*.(test|spec).[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/__tests__/utils/',
-    '/__tests__/integration/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/', '/__tests__/utils/'],
   globals: {
     'ts-jest': {
       tsconfig: {

@@ -132,6 +132,23 @@ jest.mock('react-native-lyric', () => ({
   default: 'LyricView',
 }));
 
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useFocusEffect: jest.fn((callback) => {
+    const cleanup = callback();
+    if (cleanup) return cleanup;
+  }),
+  useNavigation: jest.fn(() => ({
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  })),
+  useRoute: jest.fn(() => ({
+    params: {},
+  })),
+}));
+
 global.console = {
   ...console,
   log: jest.fn(),
