@@ -5,6 +5,7 @@ import {
   Dimensions,
   Easing,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -527,59 +528,70 @@ export default function WalkthroughScreen() {
   return (
     <View className="flex-1 bg-black">
       <AnimatedGradientBackground />
-      <View
-        style={{ paddingTop: top + 12, paddingBottom: bottom + 16 }}
-        className="flex-1 px-6"
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingTop: top + 12,
+          paddingBottom: bottom + 24,
+          paddingHorizontal: 24,
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
       >
-        <Text className="text-3xl font-bold text-white">
-          한눈에 보는 LingoFit 루틴
-        </Text>
+        <View className="flex-1">
+          <Text className="text-3xl font-bold text-white">
+            한눈에 보는 LingoFit 루틴
+          </Text>
 
-        <View className="mt-6 flex-1">
-          <DevicePreview
-            activeKey={FLOW_STEPS[activeStep].key}
-            actionAnim={actionAnim}
-            screenScale={screenScale}
-          />
+          <View className="mt-6 flex-1">
+            <DevicePreview
+              activeKey={FLOW_STEPS[activeStep].key}
+              actionAnim={actionAnim}
+              screenScale={screenScale}
+            />
 
-          <View className="mt-6 flex-1 justify-between">
-            <View>
-              <StepSelector activeIndex={activeStep} onSelect={setActiveStep} />
+            <View className="mt-6 flex-1 justify-between">
+              <View>
+                <StepSelector
+                  activeIndex={activeStep}
+                  onSelect={setActiveStep}
+                />
 
-              <View className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-lg">
-                <Text className="text-sm font-semibold text-white/80">
-                  {FLOW_STEPS[activeStep].title}
-                </Text>
-                <Text className="mt-2 text-base text-white/90">
-                  {FLOW_STEPS[activeStep].caption}
-                </Text>
-                <Text className="mt-2 text-sm text-white/60">
-                  {FLOW_STEPS[activeStep].hint}
-                </Text>
-              </View>
-            </View>
-
-            <LinearGradient
-              colors={['#0EA5E9', '#38BDF8']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="mt-5 rounded-3xl"
-            >
-              <Pressable
-                onPress={handleStart}
-                className="w-full items-center rounded-3xl px-4 py-4"
-              >
-                <View className="flex-row items-center justify-center gap-2">
-                  <Text className="text-base font-semibold text-white">
-                    지금 바로 LingoFit 시작
+                <View className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-lg">
+                  <Text className="text-sm font-semibold text-white/80">
+                    {FLOW_STEPS[activeStep].title}
                   </Text>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  <Text className="mt-2 text-base text-white/90">
+                    {FLOW_STEPS[activeStep].caption}
+                  </Text>
+                  <Text className="mt-2 text-sm text-white/60">
+                    {FLOW_STEPS[activeStep].hint}
+                  </Text>
                 </View>
-              </Pressable>
-            </LinearGradient>
+              </View>
+
+              <LinearGradient
+                colors={['#0EA5E9', '#38BDF8']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                className="mt-5 rounded-3xl"
+              >
+                <Pressable
+                  onPress={handleStart}
+                  className="w-full items-center rounded-3xl px-4 py-4"
+                >
+                  <View className="flex-row items-center justify-center gap-2">
+                    <Text className="text-base font-semibold text-white">
+                      지금 바로 LingoFit 시작
+                    </Text>
+                    <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  </View>
+                </Pressable>
+              </LinearGradient>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

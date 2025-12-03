@@ -1,6 +1,6 @@
 import { changePassword, deleteAccount, login, signup } from '@/api/auth';
+import { User } from '@/api/user';
 import { USER_QUERY_KEY } from '@/constants/queryKeys';
-import type { User } from '@/types/type';
 import {
   deleteRefreshToken,
   saveRefreshToken,

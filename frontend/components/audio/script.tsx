@@ -100,7 +100,7 @@ export default function Script({
   const seekingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 타이머 id
   const { position } = useProgress(100); // 현재 재생 위치(초 단위), 0.1초마다 갱신
   const startTimes = useMemo(
-    () => scripts.map((s) => parseFloat(s.start_time)),
+    () => scripts.map((s) => s.start_time || 0),
     [scripts],
   );
 
@@ -219,7 +219,7 @@ export default function Script({
     index: lineIndex,
   }: ListRenderItemInfo<Sentence>) => {
     const isHighlighted = lineIndex === currentLineIndex;
-    const startTime = Number.parseFloat(item.start_time) || 0;
+    const startTime = item.start_time || 0;
     const trimmedText = item.text?.trim();
     const words =
       trimmedText && trimmedText.length > 0
@@ -314,10 +314,12 @@ export default function Script({
               const key = makeVocabKey(wordPopup.sentenceIndex, wordPopup.word);
               const entry = vocabMap.get(key);
 
+              const normalizedWord = norm(entry?.word ?? wordPopup.word);
+
               const isBookmarked = selectedVocabs.some(
                 (v) =>
                   v.sentenceIndex === wordPopup.sentenceIndex &&
-                  v.word === wordPopup.word,
+                  norm(v.word) === normalizedWord,
               );
 
               return (

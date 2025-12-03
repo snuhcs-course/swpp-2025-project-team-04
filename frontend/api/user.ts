@@ -1,10 +1,20 @@
-import { User } from '@/types/type';
 import { customFetch } from './client';
 
-export const getMe = async (): Promise<User> => {
-  return customFetch<User>('/users/me', {
-    method: 'GET',
-  });
+export type Interest = {
+  key: string;
+  category: string;
+  label: string;
+};
+
+export type User = {
+  id: number;
+  username: string;
+  nickname: string;
+  level: string;
+  level_updated_at: string;
+  initial_level_completed: boolean;
+  level_score: number;
+  interests: Interest[];
 };
 
 export type UpdateInterestsPayload = {
@@ -12,16 +22,20 @@ export type UpdateInterestsPayload = {
 };
 
 export type UpdateInterestsResponse = {
-  interests: string[];
+  interests: Interest[];
+};
+
+export const getMe = async (): Promise<User> => {
+  return customFetch<User>('/user/me', {
+    method: 'GET',
+  });
 };
 
 export const updateInterests = async (
-  interests: string[],
+  interests: UpdateInterestsPayload,
 ): Promise<UpdateInterestsResponse> => {
-  const payload: UpdateInterestsPayload = { interests };
-
   return customFetch<UpdateInterestsResponse>('/user/me/interests', {
     method: 'PUT',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(interests),
   });
 };

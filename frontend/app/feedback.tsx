@@ -1,7 +1,15 @@
 import { GradientButton } from '@/components/home/GradientButton';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, Text, View, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, Text, View, Alert, SafeAreaView } from 'react-native';
+import Animated, { 
+  FadeInUp, 
+  FadeInDown, 
+  Layout, 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming 
+} from 'react-native-reanimated';
 import { submitFeedback } from '@/api/feedback';
 
 const UNDERSTANDING_DIFFICULTY_LEVELS = [
@@ -57,17 +65,6 @@ export default function FeedbackScreen() {
     number | null
   >(null);
   const [submitting, setSubmitting] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (selectedUnderstandingDifficulty !== null) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [selectedUnderstandingDifficulty]);
 
   // 페이지 마운트 시 넘어온 파라미터 로깅
   useEffect(() => {
@@ -152,137 +149,73 @@ export default function FeedbackScreen() {
     selectedSpeedDifficulty !== null;
 
   return (
-    <View className="flex-1 bg-[#EBF4FB]">
-      <View className="flex-1 px-5">
-        {/* 헤드라인 */}
-        <View className="pt-16">
-          <Text className="mb-2 text-3xl font-black text-neutral-900">
-            학습 세션 완료!
-          </Text>
-          <Text className="text-base leading-6 text-neutral-600">
-            이번 학습은 어떠셨나요?
-          </Text>
-        </View>
+    <View className="flex-1 bg-[#F5F9FF]">
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 px-5">
+          {/* 헤드라인 */}
+          <Animated.View 
+            entering={FadeInUp.delay(200).springify()}
+            className="pt-8"
+          >
+            <Text className="mb-2 text-3xl font-black text-neutral-900">
+              학습 세션 완료!
+            </Text>
+            <Text className="text-base leading-6 text-neutral-600">
+              이번 학습은 어떠셨나요?
+            </Text>
+          </Animated.View>
 
-        {/* 평가 섹션 */}
-        <View className="flex-1 pt-8">
-          {/* 이해도 평가 */}
-          <View className="mb-8">
-            <View className="mb-4 flex-row items-center justify-between">
-              <View>
-                <Text className="text-lg font-bold text-neutral-900">
-                  이해도
-                </Text>
-                <Text className="mt-1 text-sm text-neutral-500">
-                  내용중 얼마를 이해하셨나요?
-                </Text>
-              </View>
-              {selectedUnderstandingDifficulty !== null && (
-                <Text className="text-4xl">
-                  {
-                    UNDERSTANDING_DIFFICULTY_LEVELS.find(
-                      (l) => l.value === selectedUnderstandingDifficulty,
-                    )?.emoji
-                  }
-                </Text>
-              )}
-            </View>
-            <View className="flex-row gap-2">
-              {UNDERSTANDING_DIFFICULTY_LEVELS.map((level) => {
-                const isSelected =
-                  selectedUnderstandingDifficulty === level.value;
-                return (
-                  <View key={level.value} style={{ flex: 1 }}>
-                    <Pressable
-                      onPress={() =>
-                        setSelectedUnderstandingDifficulty(level.value)
-                      }
-                      android_ripple={{
-                        color: 'rgba(0,0,0,0.08)',
-                        borderless: false,
-                      }}
-                      style={({ pressed }) => ({
-                        transform: [{ scale: pressed ? 0.98 : 1 }],
-                      })}
-                      className={`items-center justify-center rounded-xl border-2 py-6 transition-all duration-150 ${
-                        isSelected
-                          ? 'border-sky-500 bg-sky-50'
-                          : 'border-gray-300 bg-white'
-                      }`}
-                    >
-                      <Text
-                        className={`text-center text-sm font-semibold ${
-                          isSelected ? 'text-sky-700' : 'text-gray-700'
-                        }`}
-                        numberOfLines={2}
-                      >
-                        {level.label}
-                      </Text>
-                    </Pressable>
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* 발화속도 평가 */}
-          {selectedUnderstandingDifficulty !== null && (
-            <Animated.View
+          {/* 평가 섹션 */}
+          <View className="flex-1 pt-8">
+            {/* 이해도 평가 */}
+            <Animated.View 
+              entering={FadeInUp.delay(400).springify()}
               className="mb-8"
-              style={{
-                opacity: fadeAnim,
-                transform: [
-                  {
-                    translateY: fadeAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [20, 0],
-                    }),
-                  },
-                ],
-              }}
             >
               <View className="mb-4 flex-row items-center justify-between">
                 <View>
                   <Text className="text-lg font-bold text-neutral-900">
-                    발화속도
+                    이해도
                   </Text>
                   <Text className="mt-1 text-sm text-neutral-500">
-                    말하기 속도는 어땠나요?
+                    내용중 얼마를 이해하셨나요?
                   </Text>
                 </View>
-                {selectedSpeedDifficulty !== null && (
-                  <Text className="text-4xl">
+                {selectedUnderstandingDifficulty !== null && (
+                  <Animated.Text 
+                    entering={FadeInUp.springify()}
+                    className="text-4xl"
+                  >
                     {
-                      SPEED_DIFFICULTY_LEVELS.find(
-                        (l) => l.value === selectedSpeedDifficulty,
+                      UNDERSTANDING_DIFFICULTY_LEVELS.find(
+                        (l) => l.value === selectedUnderstandingDifficulty,
                       )?.emoji
                     }
-                  </Text>
+                  </Animated.Text>
                 )}
               </View>
               <View className="flex-row gap-2">
-                {SPEED_DIFFICULTY_LEVELS.map((level) => {
-                  const isSelected = selectedSpeedDifficulty === level.value;
+                {UNDERSTANDING_DIFFICULTY_LEVELS.map((level) => {
+                  const isSelected =
+                    selectedUnderstandingDifficulty === level.value;
                   return (
                     <View key={level.value} style={{ flex: 1 }}>
                       <Pressable
-                        onPress={() => setSelectedSpeedDifficulty(level.value)}
-                        android_ripple={{
-                          color: 'rgba(0,0,0,0.08)',
-                          borderless: false,
-                        }}
+                        onPress={() =>
+                          setSelectedUnderstandingDifficulty(level.value)
+                        }
                         style={({ pressed }) => ({
-                          transform: [{ scale: pressed ? 0.98 : 1 }],
+                          transform: [{ scale: pressed ? 0.95 : 1 }],
                         })}
-                        className={`items-center justify-center rounded-xl border-2 py-6 transition-all duration-150 ${
+                        className={`items-center justify-center rounded-2xl border-2 py-6 transition-all duration-150 ${
                           isSelected
                             ? 'border-sky-500 bg-sky-50'
-                            : 'border-gray-300 bg-white'
+                            : 'border-gray-200 bg-white'
                         }`}
                       >
                         <Text
                           className={`text-center text-sm font-semibold ${
-                            isSelected ? 'text-sky-700' : 'text-gray-700'
+                            isSelected ? 'text-sky-700' : 'text-gray-500'
                           }`}
                           numberOfLines={2}
                         >
@@ -294,31 +227,95 @@ export default function FeedbackScreen() {
                 })}
               </View>
             </Animated.View>
-          )}
-        </View>
 
-        {/* 제출 버튼 */}
-        <View className="pb-8">
-          <View className="px-2 gap-3">
-            <GradientButton
-              title="제출하기"
-              icon="send"
-              loading={submitting}
-              disabled={!canSubmit}
-              onPress={handleSubmit}
-            />
-            <Pressable
-              onPress={() => router.replace('/')}
-              className="py-4 rounded-xl bg-gray-200"
-              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-            >
-              <Text className="text-gray-700 text-center text-base font-semibold">
-                피드백 건너뛰기
-              </Text>
-            </Pressable>
+            {/* 발화속도 평가 */}
+            {selectedUnderstandingDifficulty !== null && (
+              <Animated.View
+                entering={FadeInUp.springify()}
+                layout={Layout.springify()}
+                className="mb-8"
+              >
+                <View className="mb-4 flex-row items-center justify-between">
+                  <View>
+                    <Text className="text-lg font-bold text-neutral-900">
+                      발화속도
+                    </Text>
+                    <Text className="mt-1 text-sm text-neutral-500">
+                      말하기 속도는 어땠나요?
+                    </Text>
+                  </View>
+                  {selectedSpeedDifficulty !== null && (
+                    <Animated.Text 
+                      entering={FadeInUp.springify()}
+                      className="text-4xl"
+                    >
+                      {
+                        SPEED_DIFFICULTY_LEVELS.find(
+                          (l) => l.value === selectedSpeedDifficulty,
+                        )?.emoji
+                      }
+                    </Animated.Text>
+                  )}
+                </View>
+                <View className="flex-row gap-2">
+                  {SPEED_DIFFICULTY_LEVELS.map((level) => {
+                    const isSelected = selectedSpeedDifficulty === level.value;
+                    return (
+                      <View key={level.value} style={{ flex: 1 }}>
+                        <Pressable
+                          onPress={() => setSelectedSpeedDifficulty(level.value)}
+                          style={({ pressed }) => ({
+                            transform: [{ scale: pressed ? 0.95 : 1 }],
+                          })}
+                          className={`items-center justify-center rounded-2xl border-2 py-6 transition-all duration-150 ${
+                            isSelected
+                              ? 'border-sky-500 bg-sky-50'
+                              : 'border-gray-200 bg-white'
+                          }`}
+                        >
+                          <Text
+                            className={`text-center text-sm font-semibold ${
+                              isSelected ? 'text-sky-700' : 'text-gray-500'
+                            }`}
+                            numberOfLines={2}
+                          >
+                            {level.label}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    );
+                  })}
+                </View>
+              </Animated.View>
+            )}
           </View>
+
+          {/* 제출 버튼 */}
+          <Animated.View 
+            entering={FadeInDown.delay(600).springify()}
+            className="pb-8"
+          >
+            <View className="px-2 gap-3">
+              <GradientButton
+                title="제출하기"
+                icon="send"
+                loading={submitting}
+                disabled={!canSubmit}
+                onPress={handleSubmit}
+              />
+              <Pressable
+                onPress={() => router.replace('/')}
+                className="py-4 rounded-xl bg-gray-200"
+                style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+              >
+                <Text className="text-gray-700 text-center text-base font-semibold">
+                  피드백 건너뛰기
+                </Text>
+              </Pressable>
+            </View>
+          </Animated.View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   );
 }

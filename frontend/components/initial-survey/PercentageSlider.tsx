@@ -17,7 +17,7 @@ export default function PercentageSlider({
       <View className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden px-6 py-8">
         <View className="items-center mb-8">
           <Text
-            className="text-[80px] font-black text-center leading-[88px]"
+            className="text-[60px] font-black text-center leading-[68px]"
             style={{ color: '#0EA5E9' }}
           >
             {value}%

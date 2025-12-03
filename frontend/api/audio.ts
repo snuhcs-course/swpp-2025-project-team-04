@@ -8,8 +8,8 @@ export type AudioGenerationPayload = {
 };
 
 export type Sentence = {
-  id: string;
-  start_time: string;
+  id: number;
+  start_time: number;
   text: string;
 };
 
@@ -25,7 +25,7 @@ export type AudioGenerationResponse = {
 export const generateAudio = async (
   payload: AudioGenerationPayload,
 ): Promise<AudioGenerationResponse> => {
-  return customFetch<AudioGenerationResponse>('/audio/generate', {
+  return customFetch<AudioGenerationResponse>('/audio/generate-mock', {
     method: 'POST',
     body: JSON.stringify(payload),
   });

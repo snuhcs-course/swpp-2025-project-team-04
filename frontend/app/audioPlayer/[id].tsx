@@ -81,7 +81,7 @@ export default function AudioPlayer() {
     try {
       await TrackPlayer.stop();
       await TrackPlayer.reset();
-    } catch {}
+    } catch { }
   }, []);
 
   const endSessionWithFeedback = useCallback(async () => {
@@ -119,7 +119,7 @@ export default function AudioPlayer() {
       try {
         await TrackPlayer.play();
         if (mounted) setIsPlaying(true);
-      } catch {}
+      } catch { }
     })();
     return () => {
       mounted = false;
@@ -206,11 +206,11 @@ export default function AudioPlayer() {
         generatedContentId={data.generated_content_id}
         scripts={data.sentences}
         onVocabLookup={
-          isFromHistory ? () => {} : () => incrementLog('vocabLookupCount')
+          isFromHistory ? () => { } : () => incrementLog('vocabLookupCount')
         }
-        onRewind={isFromHistory ? () => {} : () => incrementLog('rewindCount')}
+        onRewind={isFromHistory ? () => { } : () => incrementLog('rewindCount')}
         selectedVocabs={selectedVocabs}
-        onToggleVocab={isFromHistory ? () => {} : toggleVocab}
+        onToggleVocab={isFromHistory ? () => { } : toggleVocab}
       />
 
       {/* 슬라이더 */}

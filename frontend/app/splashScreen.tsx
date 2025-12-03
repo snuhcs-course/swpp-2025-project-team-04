@@ -88,7 +88,7 @@ export default function SplashScreen({
       className="flex-1 bg-[#001F3B] items-center justify-center"
       style={{ opacity: containerOpacity }}
     >
-      {/* 
+      {/*
         Image matches Native Splash:
         - Background: #001F3B (set in container)
         - Image: splash.png

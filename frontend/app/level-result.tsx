@@ -1,57 +1,61 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ScrollView, SafeAreaView, Dimensions, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  FadeInUp, 
+  FadeInDown, 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withRepeat, 
+  withTiming, 
+  Easing 
+} from 'react-native-reanimated';
+
+import { OverallScore } from '@/components/level-result/OverallScore';
+import { StatCard } from '@/components/level-result/StatCard';
+import { RadarChart } from '@/components/level-result/RadarChart';
+import { MotivationBadge } from '@/components/level-result/MotivationBadge';
+import { ConfettiOverlay } from '@/components/level-result/ConfettiOverlay';
 
 // ============ 타입 정의 ============
 
-// CEFR 레벨 타입
 type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
-// 개별 레벨 정보
 type LevelDetail = {
-  current_level: number; // 현재 레벨 스코어
-  delta: number; // 변화량
-  cefr_level: CEFRLevel; // 현재 CEFR 레벨
-  next_level: CEFRLevel | null; // 다음 CEFR 레벨 (C2면 null)
-  remaining_to_next: number; // 다음 레벨까지 남은 점수
-  progress_in_current: number; // 현재 레벨 내 진행도 (0-100%)
-};
-
-// 피드백 응답 타입
-export type FeedbackResponse = {
-  average_level: number; // 평균 레벨
-  average_delta: number; // 평균 변화량
-  lexical: LevelDetail; // 어휘 레벨 상세
-  syntactic: LevelDetail; // 문법 레벨 상세
-  auditory: LevelDetail; // 청취 레벨 상세
+  current_level: number;
+  delta: number;
+  cefr_level: CEFRLevel;
+  next_level: CEFRLevel | null;
+  remaining_to_next: number;
+  progress_in_current: number;
+  current_start: number;
+  current_end: number;
 };
 
 // ============ 상수 정의 ============
 
-// CEFR 레벨별 시작 점수
 const LEVEL_THRESHOLDS: Record<CEFRLevel, number> = {
   A1: 0,
-  A2: 25,
-  B1: 50,
-  B2: 100,
-  C1: 150,
-  C2: 200,
+  A2: 26,
+  B1: 51,
+  B2: 101,
+  C1: 151,
+  C2: 201,
 };
 
 const MAX_SCORE = 300;
 const ORDERED_LEVELS: CEFRLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
-// 레벨별 색상
 const LEVEL_COLORS = {
-  lexical: '#3b82f6',
-  syntactic: '#7c3aed',
-  auditory: '#10b981',
+  lexical: '#3b82f6', // Blue
+  syntactic: '#8b5cf6', // Violet
+  auditory: '#10b981', // Emerald
 };
 
 // ============ 유틸리티 함수 ============
 
-// 스코어로부터 CEFR 레벨 계산
 function getCEFRLevel(score: number): CEFRLevel {
   if (score >= LEVEL_THRESHOLDS.C2) return 'C2';
   if (score >= LEVEL_THRESHOLDS.C1) return 'C1';
@@ -61,12 +65,11 @@ function getCEFRLevel(score: number): CEFRLevel {
   return 'A1';
 }
 
-// 다음 레벨 정보 계산
 function getNextLevelInfo(
   currentLevel: CEFRLevel,
 ): { nextLevel: CEFRLevel; nextThreshold: number } | null {
   const currentIndex = ORDERED_LEVELS.indexOf(currentLevel);
-  if (currentIndex === ORDERED_LEVELS.length - 1) return null; // C2는 다음 레벨 없음
+  if (currentIndex === ORDERED_LEVELS.length - 1) return null;
 
   const nextLevel = ORDERED_LEVELS[currentIndex + 1];
   return {
@@ -75,13 +78,11 @@ function getNextLevelInfo(
   };
 }
 
-// 현재 레벨 범위의 끝 점수 계산
 function getCurrentLevelEnd(currentLevel: CEFRLevel): number {
   const nextInfo = getNextLevelInfo(currentLevel);
-  return nextInfo ? nextInfo.nextThreshold : MAX_SCORE;
+  return nextInfo ? nextInfo.nextThreshold - 1 : MAX_SCORE;
 }
 
-// 레벨 상세 정보 계산
 function calculateLevelDetail(score: number, delta: number): LevelDetail {
   const cefrLevel = getCEFRLevel(score);
   const currentStart = LEVEL_THRESHOLDS[cefrLevel];
@@ -99,102 +100,37 @@ function calculateLevelDetail(score: number, delta: number): LevelDetail {
     next_level: nextInfo?.nextLevel || null,
     remaining_to_next: Math.max(0, remainingToNext),
     progress_in_current: Math.max(0, Math.min(100, progressInCurrent)),
+    current_start: currentStart,
+    current_end: currentEnd,
   };
 }
 
-// ============ 컴포넌트 ============
-
-// 개별 레벨 카드 Props
-type LevelCardProps = {
-  title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  detail: LevelDetail;
-  color: string;
-};
-
-function LevelCard({ title, icon, detail, color }: LevelCardProps) {
-  const isPositive = detail.delta > 0;
-  const isNegative = detail.delta < 0;
-
+// Background Blob Component
+function BackgroundBlob({ style }: { style: any }) {
   return (
-    <View className="bg-white rounded-2xl p-4 shadow-sm flex-1">
-      {/* 헤더 */}
-      <View className="flex-row items-center mb-3">
-        <View
-          className="w-10 h-10 rounded-full items-center justify-center mr-2.5"
-          style={{ backgroundColor: `${color}20` }}
-        >
-          <Ionicons name={icon} size={20} color={color} />
-        </View>
-        <View className="flex-1">
-          <Text className="text-sm font-semibold text-gray-800">{title}</Text>
-          <Text className="text-xs text-gray-500">{detail.cefr_level}</Text>
-        </View>
-      </View>
-
-      {/* 변화량 */}
-      <View className="items-center mb-3">
-        <View className="flex-row items-center">
-          {isPositive && <Ionicons name="arrow-up" size={28} color="#10b981" />}
-          {isNegative && (
-            <Ionicons name="arrow-down" size={28} color="#ef4444" />
-          )}
-          <Text
-            className={`ml-1 text-4xl font-bold ${
-              isPositive
-                ? 'text-green-600'
-                : isNegative
-                  ? 'text-red-600'
-                  : 'text-gray-600'
-            }`}
-          >
-            {Math.abs(detail.delta).toFixed(1)}
-          </Text>
-        </View>
-      </View>
-
-      {/* 현재 스코어 */}
-      <View className="mb-3">
-        <Text className="text-2xl font-bold" style={{ color }}>
-          {detail.current_level.toFixed(1)}
-          <Text className="text-sm text-gray-400"> / {MAX_SCORE}</Text>
-        </Text>
-      </View>
-
-      {/* 다음 레벨까지 프로그레스 바 */}
-      {detail.next_level && (
-        <View>
-          <Text className="text-xs text-gray-500 mb-1.5">
-            다음 레벨: {detail.next_level} (남은 점수:{' '}
-            {detail.remaining_to_next.toFixed(0)})
-          </Text>
-          <View className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-            <View
-              className="h-full rounded-full"
-              style={{
-                width: `${detail.progress_in_current}%`,
-                backgroundColor: color,
-              }}
-            />
-          </View>
-        </View>
-      )}
-      {!detail.next_level && (
-        <View>
-          <Text className="text-xs font-semibold text-purple-600">
-            🎉 최고 레벨!
-          </Text>
-        </View>
-      )}
-    </View>
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          width: 400,
+          height: 400,
+          borderRadius: 200,
+          opacity: 0.4,
+          backgroundColor: '#bfdbfe', // blue-200
+          // Removed filter: 'blur(60px)' as it causes issues on native
+        },
+        style,
+      ]}
+    />
   );
 }
 
 export default function LevelResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
 
-  // ============ URL 파라미터 파싱 (임시, 실제로는 API 응답 사용) ============
+  // ============ URL 파라미터 파싱 ============
   const lexicalLevel = parseFloat(
     Array.isArray(params.lexical_level)
       ? params.lexical_level[0]
@@ -234,83 +170,172 @@ export default function LevelResultScreen() {
   // ============ 평균 계산 ============
   const averageLevel = (lexicalLevel + syntacticLevel + speedLevel) / 3;
   const averageDelta = (lexicalDelta + syntacticDelta + speedDelta) / 3;
+  const averageCefr = getCEFRLevel(averageLevel);
 
-  // ============ 로깅 (개발용) ============
+  // Background Animations
+  const blob1Y = useSharedValue(0);
+  const blob1X = useSharedValue(0);
+  const blob2Y = useSharedValue(0);
+  const blob2X = useSharedValue(0);
+
   useEffect(() => {
-    console.log('📊 [레벨 결과 페이지] 계산된 데이터:', {
-      average: { level: averageLevel, delta: averageDelta },
-      lexical: lexicalDetail,
-      syntactic: syntacticDetail,
-      auditory: auditoryDetail,
-    });
+    blob1Y.value = withRepeat(
+      withTiming(-100, { duration: 8000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    blob1X.value = withRepeat(
+      withTiming(50, { duration: 12000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    
+    blob2Y.value = withRepeat(
+      withTiming(100, { duration: 9000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    blob2X.value = withRepeat(
+      withTiming(-50, { duration: 15000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
   }, []);
 
-  const isAveragePositive = averageDelta > 0;
-  const isAverageNegative = averageDelta < 0;
+  useEffect(() => {
+    setConfettiTrigger(1);
+    const secondBurst = setTimeout(
+      () => setConfettiTrigger(prev => prev + 1),
+      1800
+    );
+    const hideOverlay = setTimeout(() => setConfettiTrigger(0), 4500);
+
+    return () => {
+      clearTimeout(secondBurst);
+      clearTimeout(hideOverlay);
+    };
+  }, []);
+
+  const blob1Style = useAnimatedStyle(() => ({
+    transform: [{ translateY: blob1Y.value }, { translateX: blob1X.value }],
+    top: -100,
+    left: -100,
+    backgroundColor: '#dbeafe', // blue-100
+  }));
+
+  const blob2Style = useAnimatedStyle(() => ({
+    transform: [{ translateY: blob2Y.value }, { translateX: blob2X.value }],
+    bottom: -50,
+    right: -100,
+    backgroundColor: '#e0e7ff', // indigo-100
+  }));
 
   return (
-    <View className="flex-1 bg-[#EBF4FB]">
-      <View className="flex-1 px-6 pt-16 pb-6">
-        {/* 전체 평균 */}
-        <View className="bg-[#6FA4D7] rounded-3xl p-8 mb-4 shadow-md items-center">
-          <Text className="text-white text-xl font-semibold mb-3">
-            평균 레벨
-          </Text>
-          <Text className="text-white text-6xl font-bold mb-3">
-            {averageLevel.toFixed(1)}
-          </Text>
-          <View className="flex-row items-center">
-            {isAveragePositive && (
-              <Ionicons name="arrow-up" size={18} color="white" />
-            )}
-            {isAverageNegative && (
-              <Ionicons name="arrow-down" size={18} color="white" />
-            )}
-            <Text className="text-white font-semibold ml-1.5 text-lg">
-              {Math.abs(averageDelta).toFixed(1)}
-            </Text>
-          </View>
-        </View>
+    <View className="flex-1 bg-[#F5F9FF]">
+      {/* Dynamic Background */}
+      <View style={StyleSheet.absoluteFill} className="overflow-hidden">
+        <BackgroundBlob style={blob1Style} />
+        <BackgroundBlob style={blob2Style} />
+      </View>
 
-        {/* 개별 레벨 카드들 */}
-        <View className="flex-1 gap-3">
-          <View className="flex-1">
-            <LevelCard
-              title="어휘력"
+      <SafeAreaView className="flex-1">
+        <ScrollView 
+          className="flex-1" 
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header */}
+          <Animated.View 
+            entering={FadeInUp.delay(200).springify()}
+            className="items-center pt-6 pb-2"
+          >
+            <Text className="text-neutral-500 font-bold tracking-widest text-[10px] uppercase mb-1 bg-white/50 px-2 py-1 rounded-full overflow-hidden">
+              Session Report
+            </Text>
+            <Text className="text-2xl font-black text-neutral-900">
+              학습 분석 결과
+            </Text>
+          </Animated.View>
+
+          {/* Overall Score with Circular Progress */}
+          <OverallScore 
+            score={averageLevel} 
+            cefrLevel={averageCefr} 
+            delta={averageDelta} 
+          />
+
+          {/* Motivation Badge */}
+          <MotivationBadge 
+            score={averageLevel} 
+            delta={averageDelta} 
+          />
+
+          {/* Radar Chart */}
+          <Animated.View 
+            entering={FadeInUp.delay(400).springify()}
+            className="items-center -mt-2 mb-4"
+          >
+            <RadarChart 
+              details={{
+                lexical: lexicalDetail,
+                syntactic: syntacticDetail,
+                auditory: auditoryDetail
+              }}
+            />
+          </Animated.View>
+
+          {/* Stats Grid */}
+          <View className="px-5">
+            <Text className="text-lg font-bold text-neutral-900 mb-4 ml-1">
+              상세 분석
+            </Text>
+            
+            <StatCard
+              title="어휘력 (Lexical)"
               icon="book-outline"
               detail={lexicalDetail}
               color={LEVEL_COLORS.lexical}
+              index={0}
             />
-          </View>
-
-          <View className="flex-1">
-            <LevelCard
-              title="문법"
+            
+            <StatCard
+              title="문법 (Syntactic)"
               icon="git-network-outline"
               detail={syntacticDetail}
               color={LEVEL_COLORS.syntactic}
+              index={1}
             />
-          </View>
-
-          <View className="flex-1">
-            <LevelCard
-              title="청취력"
+            
+            <StatCard
+              title="청취력 (Auditory)"
               icon="headset-outline"
               detail={auditoryDetail}
               color={LEVEL_COLORS.auditory}
+              index={2}
             />
           </View>
-        </View>
 
-        {/* 확인 버튼 */}
-        <Pressable
-          className="bg-[#6FA4D7] rounded-2xl py-3.5 mt-4 active:opacity-80"
-          onPress={() => router.replace('/(main)')}
-        >
-          <Text className="text-white text-center text-base font-semibold">
-            확인
-          </Text>
-        </Pressable>
+          {/* Action Button */}
+          <Animated.View 
+            entering={FadeInDown.delay(800).springify()}
+            className="px-5 mt-6"
+          >
+            <Pressable
+              className="bg-blue-500 rounded-xl py-4"
+              onPress={() => router.replace('/(main)')}
+            >
+              <Text className="text-white text-center text-lg font-bold">
+                확인
+              </Text>
+            </Pressable>
+          </Animated.View>
+        </ScrollView>
+      </SafeAreaView>
+      
+      {/* Full Screen Confetti Overlay */}
+      <View style={[StyleSheet.absoluteFill, { zIndex: 100 }]} pointerEvents="none">
+        <ConfettiOverlay trigger={confettiTrigger} />
       </View>
     </View>
   );

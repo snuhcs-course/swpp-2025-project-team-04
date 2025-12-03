@@ -14,14 +14,11 @@ export type LevelTestPayload = {
 };
 
 export type LevelTestResponse = {
-  level: CEFRLevel;
-  level_description: string;
-  scores: {
-    level_score: number; // 0-100
-    llm_confidence: number; // 0-100
-  };
-  rationale: string;
-  updated_at: string;
+  success: boolean;
+  lexical: { cefr_level: string; score: number };
+  syntactic: { cefr_level: string; score: number };
+  auditory: { cefr_level: string; score: number };
+  overall: { cefr_level: string; score: number };
 };
 
 export type ManualLevelPayload = {

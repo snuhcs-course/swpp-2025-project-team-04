@@ -30,7 +30,7 @@ export default function TestOptionStep({ onSelect }: TestOptionStepProps) {
         <View className="flex-row items-center justify-center rounded-xl py-2 px-3">
           <Ionicons name="time-outline" size={16} color="#0EA5E9" />
           <Text className="text-sm text-sky-700 font-semibold ml-1.5">
-            약 3분 소요
+            약 3분 소요 · 5 문항
           </Text>
         </View>
       </View>

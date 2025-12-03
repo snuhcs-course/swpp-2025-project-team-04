@@ -1,5 +1,5 @@
-import type { User } from '@/types/type';
 import { customFetch } from './client';
+import { User } from './user';
 
 // --- Types ---
 

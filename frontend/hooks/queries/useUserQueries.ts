@@ -1,7 +1,6 @@
 import type { ApiError } from '@/api/client';
-import { getMe } from '@/api/user';
+import { getMe, User } from '@/api/user';
 import { USER_QUERY_KEY } from '@/constants/queryKeys';
-import type { User } from '@/types/type';
 import { useQuery } from '@tanstack/react-query';
 
 export const useUser = () => {

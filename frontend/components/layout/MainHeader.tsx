@@ -24,7 +24,7 @@ export default function MainHeader({ title }: MainHeaderProps) {
 
   return (
     <View style={{ paddingTop: insets.top, backgroundColor: '#ffffff' }}>
-      <View className="flex-row items-center justify-between border-b border-slate-200 px-6 pb-3 pt-2">
+      <View className="flex-row items-center justify-between border-b border-slate-200 px-6 pb-3">
         <Text className="text-xl font-extrabold text-slate-900">{title}</Text>
         <View className="flex-row items-center gap-3">
           {stats && stats.streak.consecutive_days > 0 && (

@@ -4,8 +4,12 @@ import {
   type LevelTestResponse,
   type ManualLevelResponse,
 } from '@/api/initialSurvey';
-import { updateInterests, type UpdateInterestsResponse } from '@/api/user';
-import { useMutation } from '@tanstack/react-query';
+import {
+  updateInterests,
+  UpdateInterestsPayload,
+  type UpdateInterestsResponse,
+} from '@/api/user';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type SubmitLevelTestParams = {
   levelId: string;
@@ -38,17 +42,17 @@ export const useSubmitManualLevel = () => {
   });
 };
 
-type UpdateInterestsParams = {
-  interests: string[];
-};
-
 export const useUpdateInterests = () => {
-  return useMutation({
-    mutationFn: ({ interests }: UpdateInterestsParams) =>
-      updateInterests(interests),
-    onSuccess: (data: UpdateInterestsResponse) => {
+  const qc = useQueryClient();
+
+  return useMutation<UpdateInterestsResponse, Error, UpdateInterestsPayload>({
+    mutationFn: (payload) => updateInterests(payload),
+    onSuccess: (data) => {
       console.log('관심사 업데이트 성공:', data);
+      qc.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => console.error('관심사 업데이트 실패:', error),
+    onError: (error) => {
+      console.error('관심사 업데이트 실패:', error);
+    },
   });
 };

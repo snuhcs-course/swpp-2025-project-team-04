@@ -23,7 +23,7 @@ describe('user API', () => {
 
       const result = await getMe();
 
-      expect(mockCustomFetch).toHaveBeenCalledWith('/users/me', {
+      expect(mockCustomFetch).toHaveBeenCalledWith('/user/me', {
         method: 'GET',
       });
       expect(result).toEqual(mockUser);

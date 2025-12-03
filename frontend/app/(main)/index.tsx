@@ -64,28 +64,33 @@ export default function HomeScreen() {
   const [displayedThemes, setDisplayedThemes] = useState<ThemeKey[]>([]);
 
   // 유저 관심사가 있다면 우선 채우고, 모자라면 랜덤 보충
+  console.log('THEME_KEYS:', THEME_KEYS);
+  console.log('user:', user);
+  console.log(
+    'userInterests:',
+    (user?.interests ?? []).map((i) => i.key),
+  );
+
   const generateDisplayedThemes = useCallback((): ThemeKey[] => {
-    const TOTAL = 5;
+    const FIXED = 3; // 유저 관심사 고정 개수
+    const TOTAL = 7;
 
-    // user?.interests 가 TopicKey[] 라고 가정 (아니라면 매핑 로직 추가 필요)
-    const userInterests = (user?.interests ?? []) as ThemeKey[];
+    const userInterests = (user?.interests ?? [])
+      .map((i) => i.key)
+      .filter((k): k is ThemeKey => THEME_KEYS.includes(k as ThemeKey));
 
-    // 유효한 키만 추림
-    const validInterests = userInterests.filter((k) => THEME_KEYS.includes(k));
+    // 유저 관심사가 3개 미만이어도 MAX 3개까지만 반영
+    const fixed = userInterests.slice(0, FIXED);
 
-    if (validInterests.length >= TOTAL) {
-      return validInterests.slice(0, TOTAL);
-    }
+    const remaining = THEME_KEYS.filter((k) => !fixed.includes(k));
 
-    const remaining = THEME_KEYS.filter((k) => !validInterests.includes(k));
+    // 랜덤하게 섞기
     const shuffled = [...remaining].sort(() => Math.random() - 0.5);
-    const need = TOTAL - validInterests.length;
 
-    return [
-      ...validInterests,
-      ...shuffled.slice(0, Math.min(need, shuffled.length)),
-    ];
-  }, [user, THEME_KEYS]);
+    const need = TOTAL - fixed.length; // 필요 수: 4 또는 유저 관심사가 3 미만일 경우 더 많아짐
+
+    return [...fixed, ...shuffled.slice(0, Math.min(need, shuffled.length))];
+  }, [user]);
 
   const [selectedStyle, setSelectedStyle] = useState<StyleKey | null>(null);
   const [displayedStyles, setDisplayedStyles] = useState<StyleKey[]>(() => {

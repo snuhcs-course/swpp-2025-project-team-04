@@ -19,7 +19,7 @@ type Props = {
   status: ReturnType<typeof useAudioPlayerStatus>;
   activeId: number | null;
   setActiveId: Dispatch<SetStateAction<number | null>>;
-  onDelete?: (id: number) => void;
+  onDelete?: (item: Vocab) => void;
 };
 
 export function VocabItem({
@@ -47,7 +47,11 @@ export function VocabItem({
 
         {/* ── 오른쪽: 삭제 버튼 */}
         {onDelete && (
-          <Pressable onPress={() => onDelete(item.id)} hitSlop={8}>
+          <Pressable
+            testID="delete-button"
+            onPress={() => onDelete(item)}
+            hitSlop={8}
+          >
             <Ionicons name="trash-outline" size={20} color="#EF4444" />
           </Pressable>
         )}

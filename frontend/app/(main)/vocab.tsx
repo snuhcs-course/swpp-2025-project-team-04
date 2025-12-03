@@ -5,11 +5,14 @@ import { VocabItem } from '@/components/vocab/VocabItem';
 import { useMyVocab, useDeleteMyVocab } from '@/hooks/queries/useVocabQueries';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import AlertModal from '@/components/common/modals/AlertModal';
+import type { MyVocab } from '@/api/vocab';
 
 export default function VocabScreen() {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<MyVocab | null>(null);
 
   const { data, isLoading, isError, error, refetch, isRefetching } =
     useMyVocab();
@@ -53,6 +56,19 @@ export default function VocabScreen() {
     },
     [activeId, deleteVocab, stopAndReset],
   );
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!pendingDelete) return;
+    await handleDelete(pendingDelete.id);
+  }, [handleDelete, pendingDelete]);
+
+  const openDeleteModal = useCallback((item: MyVocab) => {
+    setPendingDelete(item);
+  }, []);
+
+  const closeDeleteModal = useCallback(() => {
+    setPendingDelete(null);
+  }, []);
 
   const vocabs = data ?? [];
 
@@ -115,7 +131,7 @@ export default function VocabScreen() {
                 status={status}
                 activeId={activeId}
                 setActiveId={setActiveId}
-                onDelete={() => handleDelete(item.id)} // 삭제 콜백 연결
+                onDelete={openDeleteModal} // 삭제 확인 모달용
               />
             ))}
             {isRefetching ? (
@@ -126,6 +142,19 @@ export default function VocabScreen() {
           </View>
         </ScrollView>
       )}
+      <AlertModal
+        visible={pendingDelete !== null}
+        title="단어 삭제"
+        message={
+          pendingDelete?.word
+            ? `'${pendingDelete.word}' 단어를 삭제할까요?`
+            : '이 단어를 삭제할까요?'
+        }
+        confirmText="삭제"
+        cancelText="취소"
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </View>
   );
 }

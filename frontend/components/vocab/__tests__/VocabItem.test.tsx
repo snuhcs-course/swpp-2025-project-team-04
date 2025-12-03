@@ -105,7 +105,7 @@ describe('VocabItem', () => {
   });
 
   it('shows delete button when onDelete is provided', () => {
-    const { UNSAFE_getByType } = render(
+    const { getByTestId } = render(
       <VocabItem
         item={mockVocab}
         player={mockPlayer}
@@ -116,7 +116,7 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(UNSAFE_getByType).toBeTruthy();
+    expect(getByTestId('delete-button')).toBeTruthy();
   });
 
   it('does not show delete button when onDelete is not provided', () => {
@@ -134,7 +134,7 @@ describe('VocabItem', () => {
   });
 
   it('calls onDelete with correct id when delete button is pressed', () => {
-    const { UNSAFE_root } = render(
+    const { getByTestId } = render(
       <VocabItem
         item={mockVocab}
         player={mockPlayer}
@@ -145,15 +145,9 @@ describe('VocabItem', () => {
       />,
     );
 
-    const deleteButton = UNSAFE_root.findAll(
-      (node) => node.props.onPress && node.props.hitSlop === 8,
-    );
+    fireEvent.press(getByTestId('delete-button'));
 
-    expect(deleteButton.length).toBeGreaterThan(0);
-
-    deleteButton[0].props.onPress();
-
-    expect(mockOnDelete).toHaveBeenCalledWith(1);
+    expect(mockOnDelete).toHaveBeenCalledWith(mockVocab);
   });
 
   it('renders with different vocab data', () => {

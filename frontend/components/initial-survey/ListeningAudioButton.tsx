@@ -150,7 +150,10 @@ export default function ListeningAudioButton({
     <View className="items-center w-full mb-6">
       <View className="items-center mb-8">
         <Text className="text-[32px] font-black text-slate-900 text-center leading-[40px] tracking-tight mb-2">
-          오디오 {questionNumber}
+          듣기 평가
+        </Text>
+        <Text className="text-[20px] font-bold text-slate-700 text-center mb-1">
+          {questionNumber}/5
         </Text>
         <Text className="text-[15px] text-slate-600 text-center">
           오디오를 듣고 이해도를 평가하세요

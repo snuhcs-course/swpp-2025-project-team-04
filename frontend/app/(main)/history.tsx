@@ -7,7 +7,7 @@ import {
   Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioHistory } from '@/hooks/queries/useAudioQueries';
+import { useAudioHistory } from '@/hooks/queries/useAudioHistoryQueries';
 import { useRouter } from 'expo-router';
 import type { AudioHistoryItem } from '@/api/audioHistory';
 import type { AudioGenerationResponse } from '@/api/audio';
