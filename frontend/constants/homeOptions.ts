@@ -112,25 +112,4 @@ export const THEME_OPTIONS = {
     label: 'IT/AI',
     emoji: '🤖',
   },
-  LANGUAGE: {
-    category: '지식·교육',
-    label: '언어 학습',
-    emoji: '📚',
-  },
-
-  ESSAY: {
-    category: '개인 경험·스토리',
-    label: '에세이',
-    emoji: '✍️',
-  },
-  INTERVIEW: {
-    category: '개인 경험·스토리',
-    label: '인터뷰',
-    emoji: '🎤',
-  },
-  DAILY_LIFE: {
-    category: '개인 경험·스토리',
-    label: '일상',
-    emoji: '💬',
-  },
 } as const;

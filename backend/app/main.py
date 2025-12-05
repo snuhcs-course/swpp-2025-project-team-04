@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 from .modules.auth.endpoints import router as auth_router
 from .modules.users.endpoints import router as users_router
 from .modules.audio.endpoints import router as audio_router

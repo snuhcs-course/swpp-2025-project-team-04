@@ -52,26 +52,24 @@ export function RadarChart({ details }: RadarChartProps) {
     const v2 = normalize(details.syntactic);
     const v3 = normalize(details.auditory);
 
-    const createLoop = (target: number) => {
-      return withRepeat(
-        withSequence(
-          withTiming(0, { duration: 0 }),
-          withDelay(500, withTiming(target, { duration: 2000, easing: Easing.out(Easing.ease) })),
-          withDelay(3000, withTiming(0, { duration: 500 }))
-        ),
-        -1,
-        false
-      );
-    };
+    // 한 번만 0 → 타겟으로 채워서 삼각형이 유지되도록 수정
+    progress1.value = 0;
+    progress2.value = 0;
+    progress3.value = 0;
 
-    progress1.value = createLoop(v1);
-    progress2.value = createLoop(v2);
-    progress3.value = createLoop(v3);
-  }, [
-    details.lexical?.progress_in_current,
-    details.syntactic?.progress_in_current,
-    details.auditory?.progress_in_current,
-  ]);
+    progress1.value = withDelay(
+      150,
+      withTiming(v1, { duration: 1200, easing: Easing.out(Easing.cubic) }),
+    );
+    progress2.value = withDelay(
+      250,
+      withTiming(v2, { duration: 1200, easing: Easing.out(Easing.cubic) }),
+    );
+    progress3.value = withDelay(
+      350,
+      withTiming(v3, { duration: 1200, easing: Easing.out(Easing.cubic) }),
+    );
+  }, [details.lexical, details.syntactic, details.auditory]);
 
   const animatedPathProps = useAnimatedProps(() => {
     const p1x = CENTER + RADIUS * progress1.value * Math.cos(-Math.PI / 2);

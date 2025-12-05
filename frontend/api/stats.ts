@@ -37,6 +37,7 @@ export type StatsResponse = {
   streak: Streak;
   current_level: CurrentLevel;
   total_time_spent_minutes: number;
+  total_days: number;
   achievements: Achievement[];
 };
 

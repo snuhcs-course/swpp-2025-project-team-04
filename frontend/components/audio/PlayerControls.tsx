@@ -13,7 +13,7 @@ export default function PlayerControls({
   isPlaying,
   onTogglePlay,
   onFinish,
-  finishButtonText = '학습 끝내기',
+  finishButtonText = '학습 종료',
 }: PlayerControlsProps) {
   return (
     <View className="items-center pb-10">

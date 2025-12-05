@@ -2,15 +2,15 @@ name: Run Backend Tests
 
 on:
   push: 
-    branches: ["main"]
+    branches: ["dev-backend"]
     paths:
       - 'backend/**'
       
   pull_request:
-    branches: ["main"]
+    branches: ["dev-backend"]
     paths:
       - 'backend/**'
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,5 +38,19 @@ jobs:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_NAME: ${{ secrets.DB_NAME }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          PYTHONPATH=$PWD pytest backend/tests/ --maxfail=1 --disable-warnings -q
+          PYTHONPATH=$PWD pytest backend/tests/ \
+            --maxfail=1 --disable-warnings -q \
+            --cov=backend/app --cov-report=xml --cov-report=term-missing
+      
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./coverage.xml
+          flags: backend
+          fail_ci_if_error: true

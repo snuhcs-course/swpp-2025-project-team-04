@@ -24,9 +24,7 @@ export const useSubmitLevelTest = () => {
   return useMutation({
     mutationFn: ({ levelId, percentages }: SubmitLevelTestParams) =>
       submitLevelTest(levelId, percentages),
-    onSuccess: (data: LevelTestResponse) => {
-      console.log('레벨 테스트 제출 성공:', data);
-    },
+    onSuccess: (data: LevelTestResponse) => {},
     onError: (error) => console.error('레벨 테스트 제출 실패:', error),
   });
 };
@@ -35,9 +33,7 @@ export const useSubmitManualLevel = () => {
   return useMutation({
     mutationFn: ({ levelId }: SubmitManualLevelParams) =>
       submitManualLevel(levelId),
-    onSuccess: (data: ManualLevelResponse) => {
-      console.log('수동 레벨 설정 성공:', data);
-    },
+    onSuccess: (data: ManualLevelResponse) => {},
     onError: (error) => console.error('수동 레벨 설정 실패:', error),
   });
 };
@@ -48,7 +44,6 @@ export const useUpdateInterests = () => {
   return useMutation<UpdateInterestsResponse, Error, UpdateInterestsPayload>({
     mutationFn: (payload) => updateInterests(payload),
     onSuccess: (data) => {
-      console.log('관심사 업데이트 성공:', data);
       qc.invalidateQueries({ queryKey: ['user'] });
     },
     onError: (error) => {

@@ -37,17 +37,14 @@ export function StatCard({ title, icon, detail, color, index, onPress }: StatCar
   const progressWidth = useSharedValue(0);
 
   useEffect(() => {
-    progressWidth.value = withRepeat(
-      withSequence(
-        withTiming(0, { duration: 0 }),
-        withDelay(
-          500,
-          withTiming(detail.progress_in_current, { duration: 2000, easing: Easing.out(Easing.ease) })
-        ), 
-        withDelay(3000, withTiming(0, { duration: 500 }))
-      ),
-      -1,
-      false
+    // 0 → 목표 값으로 한 번만 채워서 게이지가 유지되도록 수정
+    progressWidth.value = 0;
+    progressWidth.value = withDelay(
+      250 + index * 120,
+      withTiming(detail.progress_in_current, {
+        duration: 1200,
+        easing: Easing.out(Easing.cubic),
+      }),
     );
   }, [detail.progress_in_current, index]);
 

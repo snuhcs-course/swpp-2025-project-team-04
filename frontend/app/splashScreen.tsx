@@ -28,9 +28,7 @@ export default function SplashScreen({
         // Wait a frame to ensure the Custom Splash is painted
         await new Promise((resolve) => setTimeout(resolve, 50));
 
-        console.log('CustomSplash: Attempting to hide native splash');
         await ExpoSplashScreen.hideAsync();
-        console.log('CustomSplash: Native splash hidden');
       } catch (e) {
         console.warn('CustomSplash: Failed to hide native splash', e);
       }

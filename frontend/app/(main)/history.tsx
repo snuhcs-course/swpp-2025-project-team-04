@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -13,11 +13,13 @@ import type { AudioHistoryItem } from '@/api/audioHistory';
 import type { AudioGenerationResponse } from '@/api/audio';
 import { useQueryClient } from '@tanstack/react-query';
 import TrackPlayer from 'react-native-track-player';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 
 export default function HistoryScreen() {
   const router = useRouter();
   const qc = useQueryClient();
+  const listRef = useRef<FlatList<AudioHistoryItem>>(null);
+  useScrollToTop(listRef);
 
   const {
     data,
@@ -174,6 +176,7 @@ export default function HistoryScreen() {
   return (
     <View className="flex-1 bg-[#EBF4FB]">
       <FlatList
+        ref={listRef}
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.generated_content_id.toString()}

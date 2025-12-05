@@ -33,7 +33,6 @@ export const useDeleteMyVocab = () => {
   return useMutation<void, ApiError, number>({
     mutationFn: (wordId: number) => deleteMyVocab(wordId),
     onSuccess: async (_, wordId) => {
-      console.log('🗑 단어 삭제 성공:', wordId);
       await qc.invalidateQueries({ queryKey: [MY_VOCAB_QUERY_KEY] });
     },
     onError: (err, wordId) => {

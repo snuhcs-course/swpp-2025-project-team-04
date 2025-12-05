@@ -1,16 +1,22 @@
-import { View, Text, Pressable, ScrollView, SafeAreaView, Dimensions, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  SafeAreaView,
+  Dimensions,
+  StyleSheet,
+} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  FadeInUp, 
-  FadeInDown, 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withRepeat, 
-  withTiming, 
-  Easing 
+import Animated, {
+  FadeInUp,
+  FadeInDown,
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
 } from 'react-native-reanimated';
 
 import { OverallScore } from '@/components/level-result/OverallScore';
@@ -182,31 +188,31 @@ export default function LevelResultScreen() {
     blob1Y.value = withRepeat(
       withTiming(-100, { duration: 8000, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true
+      true,
     );
     blob1X.value = withRepeat(
       withTiming(50, { duration: 12000, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true
+      true,
     );
-    
+
     blob2Y.value = withRepeat(
       withTiming(100, { duration: 9000, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true
+      true,
     );
     blob2X.value = withRepeat(
       withTiming(-50, { duration: 15000, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true
+      true,
     );
   }, []);
 
   useEffect(() => {
     setConfettiTrigger(1);
     const secondBurst = setTimeout(
-      () => setConfettiTrigger(prev => prev + 1),
-      1800
+      () => setConfettiTrigger((prev) => prev + 1),
+      1800,
     );
     const hideOverlay = setTimeout(() => setConfettiTrigger(0), 4500);
 
@@ -239,14 +245,14 @@ export default function LevelResultScreen() {
       </View>
 
       <SafeAreaView className="flex-1">
-        <ScrollView 
-          className="flex-1" 
+        <ScrollView
+          className="flex-1"
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <Animated.View 
+          <Animated.View
             entering={FadeInUp.delay(200).springify()}
             className="items-center pt-6 pb-2"
           >
@@ -259,28 +265,25 @@ export default function LevelResultScreen() {
           </Animated.View>
 
           {/* Overall Score with Circular Progress */}
-          <OverallScore 
-            score={averageLevel} 
-            cefrLevel={averageCefr} 
-            delta={averageDelta} 
+          <OverallScore
+            score={averageLevel}
+            cefrLevel={averageCefr}
+            delta={averageDelta}
           />
 
           {/* Motivation Badge */}
-          <MotivationBadge 
-            score={averageLevel} 
-            delta={averageDelta} 
-          />
+          <MotivationBadge score={averageLevel} delta={averageDelta} />
 
           {/* Radar Chart */}
-          <Animated.View 
+          <Animated.View
             entering={FadeInUp.delay(400).springify()}
             className="items-center -mt-2 mb-4"
           >
-            <RadarChart 
+            <RadarChart
               details={{
                 lexical: lexicalDetail,
                 syntactic: syntacticDetail,
-                auditory: auditoryDetail
+                auditory: auditoryDetail,
               }}
             />
           </Animated.View>
@@ -290,7 +293,7 @@ export default function LevelResultScreen() {
             <Text className="text-lg font-bold text-neutral-900 mb-4 ml-1">
               상세 분석
             </Text>
-            
+
             <StatCard
               title="어휘력 (Lexical)"
               icon="book-outline"
@@ -298,7 +301,7 @@ export default function LevelResultScreen() {
               color={LEVEL_COLORS.lexical}
               index={0}
             />
-            
+
             <StatCard
               title="문법 (Syntactic)"
               icon="git-network-outline"
@@ -306,7 +309,7 @@ export default function LevelResultScreen() {
               color={LEVEL_COLORS.syntactic}
               index={1}
             />
-            
+
             <StatCard
               title="청취력 (Auditory)"
               icon="headset-outline"
@@ -317,13 +320,16 @@ export default function LevelResultScreen() {
           </View>
 
           {/* Action Button */}
-          <Animated.View 
+          <Animated.View
             entering={FadeInDown.delay(800).springify()}
             className="px-5 mt-6"
           >
             <Pressable
-              className="bg-blue-500 rounded-xl py-4"
-              onPress={() => router.replace('/(main)')}
+              className="bg-blue-500 rounded-xl py-4 active:bg-blue-600"
+              onPress={() => router.replace('/')}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.85 : 1,
+              })}
             >
               <Text className="text-white text-center text-lg font-bold">
                 확인
@@ -332,9 +338,12 @@ export default function LevelResultScreen() {
           </Animated.View>
         </ScrollView>
       </SafeAreaView>
-      
+
       {/* Full Screen Confetti Overlay */}
-      <View style={[StyleSheet.absoluteFill, { zIndex: 100 }]} pointerEvents="none">
+      <View
+        style={[StyleSheet.absoluteFill, { zIndex: 100 }]}
+        pointerEvents="none"
+      >
         <ConfettiOverlay trigger={confettiTrigger} />
       </View>
     </View>

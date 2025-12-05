@@ -39,29 +39,33 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
 
   useEffect(() => {
     // Entrance animation
-    scale.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) });
-    
-    // Continuous filling animation loop
-    // Start from 0, animate to target, wait, then animate back to 0 and repeat
-    progress.value = withRepeat(
-      withSequence(
-        withTiming(0, { duration: 0 }), // Start at 0
-        withDelay(500, withTiming(targetProgress, { duration: 2000, easing: Easing.out(Easing.exp) })), // Fill up slower (2s)
-        withDelay(3000, withTiming(0, { duration: 500 })) // Wait longer (3s) then animate back to 0
-      ),
-      -1,
-      false
+    scale.value = withTiming(1, {
+      duration: 1000,
+      easing: Easing.out(Easing.cubic),
+    });
+
+    // Progress: 0 → target으로 한 번만 채우기
+    progress.value = 0;
+    progress.value = withDelay(
+      200,
+      withTiming(targetProgress, {
+        duration: 1400,
+        easing: Easing.out(Easing.cubic),
+      }),
     );
 
     // Continuous pulse animation - subtle
-    pulse.value = withDelay(2000, withRepeat(
-      withSequence(
-        withTiming(1.02, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+    pulse.value = withDelay(
+      2000,
+      withRepeat(
+        withSequence(
+          withTiming(1.02, { duration: 1500 }),
+          withTiming(1, { duration: 1500 }),
+        ),
+        -1,
+        true,
       ),
-      -1,
-      true
-    ));
+    );
 
     // Subtle rotation for background ring
     rotation.value = withRepeat(
@@ -69,7 +73,7 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
       -1,
       false
     );
-  }, [score]);
+  }, [targetProgress]);
 
   const animatedProps = useAnimatedProps(() => {
     return {

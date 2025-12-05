@@ -9,6 +9,7 @@ type ChipSelectorGroupProps = {
   value?: string | null;
   onSelectionChange?: (selected: string | null) => void;
   dense?: boolean;
+  disabled?: boolean;
 };
 
 export function ChipSelectorGroup({
@@ -17,6 +18,7 @@ export function ChipSelectorGroup({
   value,
   onSelectionChange,
   dense = false,
+  disabled = false,
 }: ChipSelectorGroupProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState<string | null>(
     value ?? null,
@@ -74,6 +76,7 @@ export function ChipSelectorGroup({
                 label={chip}
                 selected={selectedChip === chip}
                 onPress={() => selectChip(chip)}
+                disabled={disabled}
               />
             ))}
           </ScrollView>

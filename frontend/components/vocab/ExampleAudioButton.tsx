@@ -148,7 +148,7 @@ export default function ExampleAudioButton({
   const PLAYING_COLORS = ['#38BDF8', '#0284C7'] as const;
 
   // Pressable의 ripple이 모서리 밖으로 번지지 않도록 clip
-  const RADIUS = 16;
+  const RADIUS = 10;
 
   return (
     <Pressable
@@ -167,7 +167,8 @@ export default function ExampleAudioButton({
         // 내부 공통 컨텐츠
         const Inner = (
           <View
-            className={`relative flex-row items-center justify-center rounded-2xl border px-4 py-3 ${
+            style={{ borderRadius: RADIUS }} // <-- 여기 수정함: rounded-xl 대신 RADIUS 사용
+            className={`relative flex-row items-center justify-center border px-4 py-2 ${
               isPlaying
                 ? 'border-transparent'
                 : 'border-primary/40 bg-white shadow-sm'
@@ -190,21 +191,6 @@ export default function ExampleAudioButton({
                   {isPlaying ? '예문 종료' : '예문 듣기'}
                 </Text>
               </>
-            )}
-
-            {/* iOS pressed overlay (Android ripple과 병행 가능) */}
-            {pressed && (
-              <View
-                pointerEvents="none"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundColor: isPlaying
-                    ? 'rgba(255,255,255,0.14)'
-                    : 'rgba(0,0,0,0.04)',
-                  borderRadius: RADIUS,
-                }}
-              />
             )}
 
             {/* 재생 중 셔머 하이라이트 */}

@@ -25,7 +25,7 @@ export type AudioGenerationResponse = {
 export const generateAudio = async (
   payload: AudioGenerationPayload,
 ): Promise<AudioGenerationResponse> => {
-  return customFetch<AudioGenerationResponse>('/audio/generate-mock', {
+  return customFetch<AudioGenerationResponse>('/audio/generate', {
     method: 'POST',
     body: JSON.stringify(payload),
   });

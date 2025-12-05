@@ -1,6 +1,5 @@
 import type { ApiError } from '@/api/client';
 import {
-  useChangePassword,
   useDeleteAccount,
   useLogout,
 } from '@/hooks/mutations/useAuthMutations';
@@ -16,16 +15,14 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 
+// 비밀번호 관련 타입 제거함
 type ModalType =
   | 'privacy'
   | 'help'
   | 'about'
-  | 'password'
-  | 'passwordSuccess'
   | 'confirmLogout'
   | 'confirmDelete';
 
@@ -54,15 +51,6 @@ const infoModalCopy: Record<
     ],
   },
 };
-
-const initialPasswordForm = {
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: '',
-};
-
-const PASSWORD_RULE_MESSAGE =
-  '비밀번호는 8~32자이며 영문과 숫자를 모두 포함해야 합니다.';
 
 type ProfileModalProps = {
   visible: boolean;
@@ -233,12 +221,11 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { data: user, isLoading: isAuthLoading } = useUser();
   const logout = useLogout();
-  const changePasswordMutation = useChangePassword();
+  // 비밀번호 변경 훅 삭제함
   const deleteAccountMutation = useDeleteAccount();
 
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
-  const [passwordForm, setPasswordForm] = useState(initialPasswordForm);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  // 비밀번호 관련 state 삭제함
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isLogoutProcessing, setIsLogoutProcessing] = useState(false);
 
@@ -246,18 +233,12 @@ export default function ProfileScreen() {
 
   const openModal = (type: ModalType) => {
     setActiveModal(type);
-    setPasswordError(null);
     setDeleteError(null);
-    if (type === 'password') {
-      setPasswordForm(initialPasswordForm);
-    }
   };
 
   const closeModal = () => {
     setActiveModal(null);
-    setPasswordError(null);
     setDeleteError(null);
-    setPasswordForm(initialPasswordForm);
   };
 
   const handleLogoutConfirm = async () => {
@@ -297,52 +278,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const handlePasswordSubmit = async () => {
-    if (changePasswordMutation.isPending) {
-      return;
-    }
-
-    const currentPassword = passwordForm.currentPassword.trim();
-    const newPassword = passwordForm.newPassword.trim();
-    const confirmPassword = passwordForm.confirmPassword.trim();
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError('모든 비밀번호 항목을 입력해주세요.');
-      return;
-    }
-
-    if (newPassword.length < 8 || newPassword.length > 32) {
-      setPasswordError(PASSWORD_RULE_MESSAGE);
-      return;
-    }
-
-    if (!/[A-Za-z]/.test(newPassword) || !/\d/.test(newPassword)) {
-      setPasswordError(PASSWORD_RULE_MESSAGE);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    try {
-      await changePasswordMutation.mutateAsync({
-        currentPassword,
-        newPassword,
-      });
-      setPasswordForm(initialPasswordForm);
-      setPasswordError(null);
-      setActiveModal('passwordSuccess');
-    } catch (error) {
-      const message = getErrorMessage(
-        error,
-        '비밀번호 변경에 실패했습니다. 다시 시도해주세요.',
-      );
-      setPasswordError(message);
-    }
-  };
-
   const renderActiveModal = () => {
     if (!activeModal) {
       return null;
@@ -379,140 +314,7 @@ export default function ProfileScreen() {
       );
     }
 
-    if (activeModal === 'password') {
-      return (
-        <ProfileModal
-          visible
-          title="비밀번호 변경"
-          onClose={closeModal}
-          primaryLabel="변경하기"
-          onPrimary={handlePasswordSubmit}
-          secondaryLabel="취소"
-          onSecondary={closeModal}
-          isPrimaryLoading={changePasswordMutation.isPending}
-          isSecondaryDisabled={changePasswordMutation.isPending}
-          disableBackdropClose={changePasswordMutation.isPending}
-        >
-          <View className="items-center">
-            <View className="mb-4 h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <Ionicons name="lock-closed" size={28} color="#0ea5e9" />
-            </View>
-            <View className="w-full rounded-2xl bg-neutral-50 p-4">
-              <Text className="text-center text-sm font-semibold text-neutral-700">
-                현재 비밀번호를 확인하고 새 비밀번호를 설정하세요.
-              </Text>
-              <Text className="mt-2 text-center text-xs text-neutral-500">
-                비밀번호 규칙: {PASSWORD_RULE_MESSAGE}
-              </Text>
-            </View>
-          </View>
-
-          <View className="mt-5">
-            <Text className="mb-2 text-sm font-semibold text-neutral-700">
-              현재 비밀번호
-            </Text>
-            <View className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-              <TextInput
-                value={passwordForm.currentPassword}
-                onChangeText={(text) => {
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    currentPassword: text,
-                  }));
-                  setPasswordError(null);
-                }}
-                secureTextEntry
-                placeholder="현재 비밀번호"
-                placeholderTextColor="#9ca3af"
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="px-4 py-3 text-base text-neutral-900"
-                editable={!changePasswordMutation.isPending}
-              />
-            </View>
-          </View>
-
-          <View className="mt-4">
-            <Text className="mb-2 text-sm font-semibold text-neutral-700">
-              새 비밀번호
-            </Text>
-            <View className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-              <TextInput
-                value={passwordForm.newPassword}
-                onChangeText={(text) => {
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    newPassword: text,
-                  }));
-                  setPasswordError(null);
-                }}
-                secureTextEntry
-                placeholder="새 비밀번호 (8~32자, 영문+숫자 포함)"
-                placeholderTextColor="#9ca3af"
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="px-4 py-3 text-base text-neutral-900"
-                editable={!changePasswordMutation.isPending}
-              />
-            </View>
-          </View>
-
-          <View className="mt-4">
-            <Text className="mb-2 text-sm font-semibold text-neutral-700">
-              새 비밀번호 확인
-            </Text>
-            <View className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-              <TextInput
-                value={passwordForm.confirmPassword}
-                onChangeText={(text) => {
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    confirmPassword: text,
-                  }));
-                  setPasswordError(null);
-                }}
-                secureTextEntry
-                placeholder="새 비밀번호 다시 입력"
-                placeholderTextColor="#9ca3af"
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="px-4 py-3 text-base text-neutral-900"
-                editable={!changePasswordMutation.isPending}
-              />
-            </View>
-          </View>
-
-          {passwordError ? (
-            <View className="mt-4 rounded-xl bg-red-50 p-3">
-              <Text className="text-sm font-semibold text-red-600">
-                {passwordError}
-              </Text>
-            </View>
-          ) : null}
-        </ProfileModal>
-      );
-    }
-
-    if (activeModal === 'passwordSuccess') {
-      return (
-        <ProfileModal
-          visible
-          title="비밀번호가 변경되었어요!"
-          onClose={closeModal}
-          primaryLabel="확인"
-          onPrimary={closeModal}
-        >
-          <View className="items-center">
-            <View className="mb-4 h-16 w-16 items-center justify-center rounded-2xl bg-green-100">
-              <Ionicons name="checkmark-circle" size={40} color="#16a34a" />
-            </View>
-            <Text className="text-center text-sm font-semibold text-neutral-700">
-              새 비밀번호가 적용되었습니다. 계속 이용해 주세요.
-            </Text>
-          </View>
-        </ProfileModal>
-      );
-    }
+    // 비밀번호 모달 렌더링 부분 삭제함
 
     if (activeModal === 'confirmLogout') {
       return (
@@ -571,17 +373,6 @@ export default function ProfileScreen() {
 
   return (
     <View className="flex-1 bg-[#EBF4FB]">
-      <View className="border-b border-slate-200 bg-white px-6 pb-3 pt-12">
-        <View className="flex-row items-center">
-          <Pressable
-            onPress={() => router.back()}
-            className="mr-3 h-9 w-9 items-center justify-center rounded-full active:bg-neutral-100"
-          >
-            <Ionicons name="close" size={24} color="#1e293b" />
-          </Pressable>
-          <Text className="text-xl font-extrabold text-slate-900">프로필</Text>
-        </View>
-      </View>
       <ScrollView
         className="flex-1 px-6"
         contentContainerStyle={{ paddingBottom: 32 }}
@@ -615,14 +406,7 @@ export default function ProfileScreen() {
           <Text className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-500">
             계정
           </Text>
-          <ActionRow
-            className="mb-3"
-            iconName="lock-closed-outline"
-            title="비밀번호 변경"
-            description="새 비밀번호로 계정을 보호하세요."
-            onPress={() => openModal('password')}
-            disabled={actionsDisabled}
-          />
+          {/* 비밀번호 변경 버튼 삭제함 */}
           <ActionRow
             className="mb-3"
             iconName="log-out-outline"

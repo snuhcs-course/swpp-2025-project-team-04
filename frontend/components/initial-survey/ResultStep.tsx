@@ -1,4 +1,5 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { LevelTestResponse } from '@/api/initialSurvey';
 import LevelCard from '@/components/shared/LevelCard';
@@ -26,60 +27,82 @@ export default function ResultStep({ results, onNext }: ResultStepProps) {
     const averageLevel = results.overall.score;
 
     return (
-        <View className="flex-1">
-            <View className="mb-6">
-                <Text className="text-2xl font-bold text-gray-900 mb-2">
-                    레벨 테스트 결과 📊
-                </Text>
-                <Text className="text-gray-600">
-                    분석된 현재 영어 실력입니다.
-                </Text>
-            </View>
+        <View className="flex-1 pb-4 pt-20">
+            <ScrollView
+                className="flex-1"
+                contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+                showsVerticalScrollIndicator={false}
+            >
+                <View className="mb-4">
+                    <Text className="text-[32px] font-black text-slate-900 mb-2 text-center leading-[40px] tracking-tight">
+                        레벨 테스트 결과
+                    </Text>
+                    <Text className="text-[15px] text-slate-600 text-center leading-[22px]">
+                        분석된 현재 영어 실력입니다
+                    </Text>
+                </View>
 
-            {/* 전체 평균 */}
-            <View className="bg-[#6FA4D7] rounded-3xl p-8 mb-4 shadow-md items-center">
-                <Text className="text-white text-xl font-semibold mb-3">
-                    종합 레벨
-                </Text>
-                <Text className="text-white text-6xl font-bold mb-1">
-                    {results.overall.cefr_level}
-                </Text>
-                <Text className="text-white/80 text-sm">
-                    Score: {averageLevel.toFixed(1)}
-                </Text>
-            </View>
+                {/* 전체 평균 */}
+                <View className="rounded-[32px] mb-6 shadow-md mx-4 overflow-hidden">
+                    <LinearGradient
+                        colors={['#0EA5E9', '#38BDF8']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        className="p-6 items-center"
+                    >
+                        <Text className="text-white text-lg font-bold mb-2 opacity-90">
+                            종합 레벨
+                        </Text>
+                        <Text className="text-white text-[56px] font-black mb-1 leading-[64px]">
+                            {results.overall.cefr_level}
+                        </Text>
+                        <View className="bg-white/20 px-4 py-1 rounded-full">
+                            <Text className="text-white font-semibold text-xs">
+                                Score: {averageLevel.toFixed(1)}
+                            </Text>
+                        </View>
+                    </LinearGradient>
+                </View>
 
-            {/* 개별 레벨 카드들 */}
-            <View className="gap-3 mb-6">
-                <LevelCard
-                    title="어휘력"
-                    icon="book-outline"
-                    detail={lexicalDetail}
-                    color={LEVEL_COLORS.lexical}
-                />
+                {/* 개별 레벨 카드들 */}
+                <View className="gap-3 mb-4">
+                    <LevelCard
+                        title="어휘력"
+                        icon="book-outline"
+                        detail={lexicalDetail}
+                        color={LEVEL_COLORS.lexical}
+                    />
 
-                <LevelCard
-                    title="문법"
-                    icon="git-network-outline"
-                    detail={syntacticDetail}
-                    color={LEVEL_COLORS.syntactic}
-                />
+                    <LevelCard
+                        title="문법"
+                        icon="git-network-outline"
+                        detail={syntacticDetail}
+                        color={LEVEL_COLORS.syntactic}
+                    />
 
-                <LevelCard
-                    title="청취력"
-                    icon="headset-outline"
-                    detail={auditoryDetail}
-                    color={LEVEL_COLORS.auditory}
-                />
-            </View>
+                    <LevelCard
+                        title="청취력"
+                        icon="headset-outline"
+                        detail={auditoryDetail}
+                        color={LEVEL_COLORS.auditory}
+                    />
+                </View>
+            </ScrollView>
 
             <Pressable
-                className="bg-[#6FA4D7] rounded-xl py-4 items-center active:opacity-80"
                 onPress={onNext}
+                className="overflow-hidden rounded-2xl shadow-sm active:opacity-90 mt-auto"
             >
-                <Text className="text-white font-bold text-lg">
-                    관심사 선택하러 가기
-                </Text>
+                <LinearGradient
+                    colors={['#0EA5E9', '#38BDF8']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    className="py-4 items-center"
+                >
+                    <Text className="text-white font-bold text-[17px]">
+                        관심사 선택하러 가기
+                    </Text>
+                </LinearGradient>
             </Pressable>
         </View>
     );

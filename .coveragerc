@@ -1,0 +1,6 @@
+[run]
+source = backend/app
+branch = True
+
+[report]
+show_missing = True

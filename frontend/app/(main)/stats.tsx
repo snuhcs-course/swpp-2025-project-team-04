@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -11,9 +11,12 @@ import {
 
 import type { Achievement } from '@/api/stats'; // Achievement 타입은 모달을 위해 계속 사용
 import { useStats } from '@/hooks/queries/useStatsQueries';
+import { useScrollToTop } from '@react-navigation/native';
 
 export default function StatsScreen() {
   const { data: stats, isLoading, error } = useStats();
+  const scrollRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollRef);
 
   const [selectedAchievement, setSelectedAchievement] =
     useState<Achievement | null>(null);
@@ -62,17 +65,6 @@ export default function StatsScreen() {
     return date;
   });
 
-  console.log('=== WEEKLY ACTIVITY DEBUG ===');
-  console.log('Today:', formatLocalDate(today));
-  console.log(
-    'Last 7 days:',
-    last7Days.map((d) => formatLocalDate(d)),
-  );
-  console.log(
-    'API daily_minutes data:',
-    JSON.stringify(stats.streak.daily_minutes, null, 2),
-  );
-
   const dailyMinutesMap = new Map(
     stats.streak.daily_minutes.map((day) => [day.date, day.minutes]),
   );
@@ -87,10 +79,6 @@ export default function StatsScreen() {
     0,
   );
   const maxMinutes = Math.max(...weeklyActivity, 1);
-
-  const totalStudyDays = stats.streak.daily_minutes.filter(
-    (day) => day.minutes > 0,
-  ).length;
 
   // Helper function to calculate progress within current level
   const calculateLevelProgress = (score: number, cefr_level: string) => {
@@ -125,10 +113,6 @@ export default function StatsScreen() {
   const achievedCount = achievements.filter((a) => a.achieved).length;
   const totalAchievements = achievements.length;
 
-  console.log('=== ACHIEVEMENTS DEBUG ===');
-  console.log('Total achievements:', totalAchievements);
-  console.log('Achievements:', JSON.stringify(achievements, null, 2));
-
   const getBadgeIcon = (code: string) => {
     const iconMap: Record<string, string> = {
       FIRST_SESSION: '🌱',
@@ -151,11 +135,10 @@ export default function StatsScreen() {
     setModalVisible(true);
   };
 
-  console.log('stats data:', stats);
-
   return (
     <View className="flex-1 bg-[#EBF4FB]">
       <ScrollView
+        ref={scrollRef}
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
@@ -351,7 +334,7 @@ export default function StatsScreen() {
                 </Text>
               </View>
               <Text className="text-2xl font-black text-neutral-900">
-                {totalStudyDays}d
+                {stats.total_days}d
               </Text>
             </View>
           </View>

@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { VocabItem } from '@/components/vocab/VocabItem';
 import { useMyVocab, useDeleteMyVocab } from '@/hooks/queries/useVocabQueries';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import AlertModal from '@/components/common/modals/AlertModal';
 import type { MyVocab } from '@/api/vocab';
 
@@ -13,6 +13,8 @@ export default function VocabScreen() {
   const status = useAudioPlayerStatus(player);
   const [activeId, setActiveId] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<MyVocab | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollRef);
 
   const { data, isLoading, isError, error, refetch, isRefetching } =
     useMyVocab();
@@ -118,6 +120,7 @@ export default function VocabScreen() {
         </View>
       ) : (
         <ScrollView
+          ref={scrollRef}
           className="flex-1"
           contentContainerStyle={{ paddingBottom: 32 }}
           showsVerticalScrollIndicator={false}

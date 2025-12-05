@@ -48,7 +48,6 @@ async function setupPlayerOnce() {
         },
         notificationCapabilities: [],
       });
-      console.log('TP: 설정 완료');
     }
   } catch (err) {
     console.error('TP: setup 실패', err);
@@ -84,7 +83,6 @@ function RootNavigation() {
   useEffect(() => {
     const handleDeepLink = async (event: { url: string }) => {
       const url = event.url;
-      console.log('[Deep Link] Received URL:', url);
 
       // 탭하면 오디오페이지로 navigate
       if (url.includes('notification.click')) {
@@ -136,13 +134,6 @@ function RootNavigation() {
         />
         <Stack.Screen name="feedback" options={{ headerShown: false }} />
         <Stack.Screen name="level-result" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="profile"
-          options={{
-            headerShown: false,
-            presentation: 'modal',
-          }}
-        />
       </Stack.Protected>
       <Stack.Protected guard={!user}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />

@@ -71,7 +71,6 @@ export default function InitialSurveyScreen() {
         { levelId: userInput.proficiencyLevel },
         {
           onSuccess: (data) => {
-            console.log('Manual level submitted successfully:', data);
             setCurrentStep(currentStep + 1);
           },
           onError: () => {
@@ -87,8 +86,6 @@ export default function InitialSurveyScreen() {
     }
     // Step 2에서 선택 없이 넘어가기 방지
     if (currentStep === 2 && skipTest === null) return;
-
-
 
     // Step 7 (Last Question) -> Submit Level Test
     if (currentStep === 7) {
@@ -106,7 +103,6 @@ export default function InitialSurveyScreen() {
         },
         {
           onSuccess: (data) => {
-            console.log('Level test submitted successfully:', data);
             setTestResult(data);
             setCurrentStep(8);
           },
@@ -126,7 +122,7 @@ export default function InitialSurveyScreen() {
 
   const handleBack = () => {
     if (currentStep > 0) {
-      if (currentStep === 8 && skipTest === true) {
+      if ((currentStep === 8 || currentStep === 9) && skipTest === true) {
         setCurrentStep(2);
       } else {
         setCurrentStep(currentStep - 1);
@@ -147,7 +143,6 @@ export default function InitialSurveyScreen() {
           { interests: userInput.selectedTopics },
           {
             onSuccess: (data) => {
-              console.log('Interests updated successfully:', data);
               goToWalkthrough();
             },
             onError: () => {
@@ -266,8 +261,6 @@ export default function InitialSurveyScreen() {
                   { levelId: userInput.proficiencyLevel },
                   {
                     onSuccess: (data: any) => {
-                      console.log('Manual level submitted:', data);
-
                       // Construct mock result for manual level
                       const cefr = mapLevelIdToCEFR(userInput.proficiencyLevel);
                       const score = LEVEL_THRESHOLDS[cefr] || 0;
@@ -277,16 +270,16 @@ export default function InitialSurveyScreen() {
                         lexical: { cefr_level: cefr, score: score },
                         syntactic: { cefr_level: cefr, score: score },
                         auditory: { cefr_level: cefr, score: score },
-                        overall: { cefr_level: cefr, score: score }
+                        overall: { cefr_level: cefr, score: score },
                       };
 
                       setTestResult(mockResult);
-                      setCurrentStep(8);
+                      setCurrentStep(9);
                     },
                     onError: () => {
                       Alert.alert('오류', '제출에 실패했습니다.');
-                    }
-                  }
+                    },
+                  },
                 );
               } else {
                 setCurrentStep(currentStep + 1);
@@ -381,10 +374,7 @@ export default function InitialSurveyScreen() {
         );
       case 8:
         return testResult ? (
-          <ResultStep
-            results={testResult}
-            onNext={() => setCurrentStep(9)}
-          />
+          <ResultStep results={testResult} onNext={() => setCurrentStep(9)} />
         ) : null;
       case 9:
         return (
@@ -400,8 +390,8 @@ export default function InitialSurveyScreen() {
     }
   };
 
-  // Result Page(8)와 Topic Selection(9)은 스크롤 가능해야 함
-  const isScrollableStep = currentStep >= 8;
+  // Topic Selection(9)만 스크롤 가능
+  const isScrollableStep = currentStep === 9;
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#EBF4FB' }}>

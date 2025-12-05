@@ -4,10 +4,10 @@ name: Deploy FastAPI Backend to EC2
 on:
   push:
     branches:
-      - main
+      - dev-backend
     paths:
       - 'backend/**'
-
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,14 +23,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ec2-user/swpp-2025-project-team-04
-            git pull origin main
+            cd /home/ec2-user/swpp-2025-project-team-04/backend
+            git pull origin dev-backend
 
+            echo "Stopping and removing existing container..."
             docker stop backend || true
             docker rm backend || true
 
-            docker rmi backend-image || true
+            echo "Cleaning up old images..."
+            docker image prune -f || true
+            docker image prune -a -f || true
 
-            docker build -t backend-image ./backend
+            echo "Building new backend image..."
+            docker build -t backend-image .
 
+            echo "Running new backend container..."
             docker run -d --name backend -p 3000:3000 backend-image

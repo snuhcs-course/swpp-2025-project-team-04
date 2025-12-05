@@ -129,7 +129,7 @@ export default function SignUpScreen() {
                 }}
                 secureTextEntry
                 textContentType="newPassword"
-                placeholder="8~32자, 영문과 숫자 포함"
+                placeholder="3~30자 비밀번호를 입력하세요"
                 editable={!signupMutation.isPending}
                 returnKeyType="next"
                 containerClassName="mb-5"
@@ -174,7 +174,7 @@ export default function SignUpScreen() {
             {/* 하단 링크 */}
             <View className="mt-8">
               <Pressable
-                onPress={() => router.back()}
+                onPress={() => router.replace('/login')}
                 disabled={signupMutation.isPending}
                 android_ripple={{
                   color: 'rgba(255,255,255,0.25)',

@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 type GradientButtonProps = {
   title: string;
+  loadingMessage?: string;
   icon?: keyof typeof Ionicons.glyphMap;
   loading?: boolean;
   disabled?: boolean;
@@ -21,6 +22,7 @@ type GradientButtonProps = {
 
 export function GradientButton({
   title,
+  loadingMessage,
   icon = 'musical-notes',
   loading = false,
   disabled = false,
@@ -87,7 +89,7 @@ export function GradientButton({
               <>
                 <ActivityIndicator size="small" color="#fff" />
                 <Text className="ml-2 text-lg font-bold text-white">
-                  생성 중...
+                  {loadingMessage || '로딩 중...'}
                 </Text>
               </>
             ) : (

@@ -1,23 +1,20 @@
 import { GradientButton } from '@/components/home/GradientButton';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, Text, View, Alert, SafeAreaView } from 'react-native';
-import Animated, { 
-  FadeInUp, 
-  FadeInDown, 
-  Layout, 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming 
+import Animated, {
+  FadeInUp,
+  FadeInDown,
+  Layout,
 } from 'react-native-reanimated';
 import { submitFeedback } from '@/api/feedback';
 
 const UNDERSTANDING_DIFFICULTY_LEVELS = [
-  { value: 1, label: '매우 낮음', emoji: '😰', backendValue: 4 },
-  { value: 2, label: '낮음', emoji: '😟', backendValue: 3 },
+  { value: 1, label: '매우 낮음', emoji: '😰', backendValue: 0 },
+  { value: 2, label: '낮음', emoji: '😟', backendValue: 1 },
   { value: 3, label: '보통', emoji: '😐', backendValue: 2 },
-  { value: 4, label: '높음', emoji: '🙂', backendValue: 1 },
-  { value: 5, label: '매우 높음', emoji: '😊', backendValue: 0 },
+  { value: 4, label: '높음', emoji: '🙂', backendValue: 3 },
+  { value: 5, label: '매우 높음', emoji: '😊', backendValue: 4 },
 ];
 
 const SPEED_DIFFICULTY_LEVELS = [
@@ -66,23 +63,6 @@ export default function FeedbackScreen() {
   >(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // 페이지 마운트 시 넘어온 파라미터 로깅
-  useEffect(() => {
-    console.log('📥 [피드백 페이지] 받은 파라미터:', {
-      generated_content_id: generatedContentId,
-      pause_cnt: pauseCount,
-      rewind_cnt: rewindCount,
-      vocab_lookup_cnt: vocabLookupCount,
-      vocab_save_cnt: vocabSaveCount,
-    });
-  }, [
-    generatedContentId,
-    pauseCount,
-    rewindCount,
-    vocabLookupCount,
-    vocabSaveCount,
-  ]);
-
   const handleSubmit = async () => {
     if (
       !selectedUnderstandingDifficulty ||
@@ -114,11 +94,7 @@ export default function FeedbackScreen() {
         speed_difficulty: speedBackendValue,
       };
 
-      console.log('📤 [피드백 제출]', payload);
-
       const response = await submitFeedback(payload);
-
-      console.log('✅ [피드백 응답]', response);
 
       // 레벨 결과 페이지로 이동
       router.replace({
@@ -153,7 +129,7 @@ export default function FeedbackScreen() {
       <SafeAreaView className="flex-1">
         <View className="flex-1 px-5">
           {/* 헤드라인 */}
-          <Animated.View 
+          <Animated.View
             entering={FadeInUp.delay(200).springify()}
             className="pt-8"
           >
@@ -168,7 +144,7 @@ export default function FeedbackScreen() {
           {/* 평가 섹션 */}
           <View className="flex-1 pt-8">
             {/* 이해도 평가 */}
-            <Animated.View 
+            <Animated.View
               entering={FadeInUp.delay(400).springify()}
               className="mb-8"
             >
@@ -182,7 +158,7 @@ export default function FeedbackScreen() {
                   </Text>
                 </View>
                 {selectedUnderstandingDifficulty !== null && (
-                  <Animated.Text 
+                  <Animated.Text
                     entering={FadeInUp.springify()}
                     className="text-4xl"
                   >
@@ -245,7 +221,7 @@ export default function FeedbackScreen() {
                     </Text>
                   </View>
                   {selectedSpeedDifficulty !== null && (
-                    <Animated.Text 
+                    <Animated.Text
                       entering={FadeInUp.springify()}
                       className="text-4xl"
                     >
@@ -263,7 +239,9 @@ export default function FeedbackScreen() {
                     return (
                       <View key={level.value} style={{ flex: 1 }}>
                         <Pressable
-                          onPress={() => setSelectedSpeedDifficulty(level.value)}
+                          onPress={() =>
+                            setSelectedSpeedDifficulty(level.value)
+                          }
                           style={({ pressed }) => ({
                             transform: [{ scale: pressed ? 0.95 : 1 }],
                           })}
@@ -291,28 +269,18 @@ export default function FeedbackScreen() {
           </View>
 
           {/* 제출 버튼 */}
-          <Animated.View 
+          <Animated.View
             entering={FadeInDown.delay(600).springify()}
             className="pb-8"
           >
-            <View className="px-2 gap-3">
-              <GradientButton
-                title="제출하기"
-                icon="send"
-                loading={submitting}
-                disabled={!canSubmit}
-                onPress={handleSubmit}
-              />
-              <Pressable
-                onPress={() => router.replace('/')}
-                className="py-4 rounded-xl bg-gray-200"
-                style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-              >
-                <Text className="text-gray-700 text-center text-base font-semibold">
-                  피드백 건너뛰기
-                </Text>
-              </Pressable>
-            </View>
+            <GradientButton
+              title="제출하기"
+              loadingMessage="제출 중..."
+              icon="send"
+              loading={submitting}
+              disabled={!canSubmit}
+              onPress={handleSubmit}
+            />
           </Animated.View>
         </View>
       </SafeAreaView>

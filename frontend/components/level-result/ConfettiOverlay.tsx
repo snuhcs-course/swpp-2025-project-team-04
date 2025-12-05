@@ -39,19 +39,28 @@ const Particle = ({ index, trigger, onComplete }: ParticleProps) => {
 
     // Randomize destination
     const angle = Math.random() * Math.PI * 2;
-    const destX = width / 2 + Math.cos(angle) * (width * 0.8);
-    const destY = height / 2 + Math.sin(angle) * (height * 0.8) - 100;
+    const destX = width / 2 + Math.cos(angle) * (width * 0.6);
+    const destY = height / 2 + Math.sin(angle) * (height * 0.6) - 80;
 
     // Start animations immediately
-    scale.value = withSpring(1 + Math.random(), { damping: 10, stiffness: 100 });
-    rotation.value = withTiming(Math.random() * 720 - 360, { duration: 1500 });
-    
-    x.value = withTiming(destX, { duration: 1500, easing: Easing.out(Easing.quad) });
-    y.value = withTiming(destY, { duration: 1500, easing: Easing.out(Easing.quad) });
-    
+    scale.value = withSpring(1 + Math.random() * 0.5, {
+      damping: 12,
+      stiffness: 120,
+    });
+    rotation.value = withTiming(Math.random() * 540 - 270, { duration: 900 });
+
+    x.value = withTiming(destX, {
+      duration: 900,
+      easing: Easing.out(Easing.quad),
+    });
+    y.value = withTiming(destY, {
+      duration: 900,
+      easing: Easing.out(Easing.quad),
+    });
+
     opacity.value = withSequence(
       withTiming(1, { duration: 50 }), // Faster fade in
-      withDelay(800, withTiming(0, { duration: 700 }))
+      withDelay(550, withTiming(0, { duration: 400 })),
     );
   }, [trigger]); // Re-run animation whenever trigger increments
 
@@ -71,7 +80,7 @@ const Particle = ({ index, trigger, onComplete }: ParticleProps) => {
   // Random shape
   const isCircle = index % 3 === 0;
   const isSquare = index % 3 === 1;
-  const size = 8 + Math.random() * 8;
+  const size = 8 + Math.random() * 6;
 
   return (
     <Animated.View
@@ -92,7 +101,7 @@ export function ConfettiOverlay({ trigger }: { trigger: number }) {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {trigger > 0 &&
-        Array.from({ length: 50 }).map((_, i) => (
+        Array.from({ length: 24 }).map((_, i) => (
           <Particle
             key={`${trigger}-${i}`}
             index={i}

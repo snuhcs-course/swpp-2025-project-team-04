@@ -25,8 +25,8 @@ export default function LevelCard({ title, icon, detail, color }: LevelCardProps
                     <Ionicons name={icon} size={20} color={color} />
                 </View>
                 <View className="flex-1">
-                    <Text className="text-sm font-semibold text-gray-800">{title}</Text>
-                    <Text className="text-xs text-gray-500">{detail.cefr_level}</Text>
+                    <Text className="text-sm font-semibold text-slate-700">{title}</Text>
+                    <Text className="text-xs text-slate-500">{detail.cefr_level}</Text>
                 </View>
             </View>
 
@@ -43,7 +43,7 @@ export default function LevelCard({ title, icon, detail, color }: LevelCardProps
                                 ? 'text-green-600'
                                 : isNegative
                                     ? 'text-red-600'
-                                    : 'text-gray-600'
+                                    : 'text-slate-600'
                                 }`}
                         >
                             {Math.abs(detail.delta).toFixed(1)}
@@ -56,18 +56,18 @@ export default function LevelCard({ title, icon, detail, color }: LevelCardProps
             <View className="mb-3">
                 <Text className="text-2xl font-bold" style={{ color }}>
                     {detail.current_level.toFixed(1)}
-                    <Text className="text-sm text-gray-400"> / {MAX_SCORE}</Text>
+                    <Text className="text-sm text-slate-400"> / {MAX_SCORE}</Text>
                 </Text>
             </View>
 
             {/* 다음 레벨까지 프로그레스 바 */}
             {detail.next_level && (
                 <View>
-                    <Text className="text-xs text-gray-500 mb-1.5">
+                    <Text className="text-xs text-slate-500 mb-1.5">
                         다음 레벨: {detail.next_level} (남은 점수:{' '}
                         {detail.remaining_to_next.toFixed(0)})
                     </Text>
-                    <View className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <View className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <View
                             className="h-full rounded-full"
                             style={{

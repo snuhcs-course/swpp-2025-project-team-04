@@ -206,7 +206,8 @@ const HomePreview = ({ action }: { action: Animated.Value }) => {
           colors={['#59C3FF', '#3A8DFF']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          className="rounded-[30px]"
+          className="rounded-[30px] overflow-hidden"
+          style={{ borderRadius: 30 }}
         >
           <View className="flex-row items-center justify-center gap-2 px-6 py-4">
             <Ionicons name="musical-notes" size={18} color="#fff" />
@@ -249,7 +250,8 @@ const SessionPreview = ({ action }: { action: Animated.Value }) => {
       colors={['#0A4D94', '#0A72C6']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
-      className="h-full rounded-[32px] px-5 py-6 shadow-xl shadow-black/40"
+      className="h-full rounded-[32px] px-5 py-6 shadow-xl shadow-black/40 overflow-hidden"
+      style={{ borderRadius: 32 }}
     >
       <Text className="text-xs font-semibold uppercase tracking-[3px] text-white/70">
         오디오 세션
@@ -300,7 +302,8 @@ const VocabPreview = ({ action }: { action: Animated.Value }) => {
           colors={['#0A4D94', '#0A72C6']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          className="rounded-3xl border border-slate-100 p-4"
+          className="rounded-3xl border border-slate-100 p-4 overflow-hidden"
+          style={{ borderRadius: 24 }}
         >
           <Text className="text-xs uppercase tracking-[3px] text-white/70">
             세션 스크립트
@@ -449,7 +452,8 @@ const StepSelector = ({
             colors={['#0EA5E9', '#38BDF8']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            className="rounded-2xl"
+            className="rounded-2xl overflow-hidden"
+            style={{ borderRadius: 16 }}
           >
             <Pressable
               onPress={() => onSelect(index)}
@@ -574,7 +578,8 @@ export default function WalkthroughScreen() {
                 colors={['#0EA5E9', '#38BDF8']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                className="mt-5 rounded-3xl"
+                className="mt-5 rounded-3xl overflow-hidden"
+                style={{ borderRadius: 24 }}
               >
                 <Pressable
                   onPress={handleStart}

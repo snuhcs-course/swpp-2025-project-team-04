@@ -1,13 +1,13 @@
 import { ChipSelectorGroup } from '@/components/home/ChipSelectorGroup';
 import { STYLE_OPTIONS, THEME_OPTIONS } from '@/constants/homeOptions';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   Text,
   View,
+  ToastAndroid,
 } from 'react-native';
 import { useGenerateAudio } from '@/hooks/mutations/useAudioMutations';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,12 +18,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { STATS_QUERY_KEY, VOCAB_QUERY_KEY } from '@/constants/queryKeys';
 import { getVocab } from '@/api/vocab';
+import { useScrollToTop } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const qc = useQueryClient();
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollRef);
 
   const { data: user, isLoading: isUserLoading } = useUser();
+  const [lastGeneratedId, setLastGeneratedId] = useState<number | null>(null);
 
   // --- 타입 & 유틸
   type ThemeKey = keyof typeof THEME_OPTIONS;
@@ -62,14 +66,6 @@ export default function HomeScreen() {
   // --- 주제(Theme) 관리: 키 기반
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey | null>(null);
   const [displayedThemes, setDisplayedThemes] = useState<ThemeKey[]>([]);
-
-  // 유저 관심사가 있다면 우선 채우고, 모자라면 랜덤 보충
-  console.log('THEME_KEYS:', THEME_KEYS);
-  console.log('user:', user);
-  console.log(
-    'userInterests:',
-    (user?.interests ?? []).map((i) => i.key),
-  );
 
   const generateDisplayedThemes = useCallback((): ThemeKey[] => {
     const FIXED = 3; // 유저 관심사 고정 개수
@@ -126,7 +122,7 @@ export default function HomeScreen() {
     if (!selectedTheme && !selectedStyle) {
       return (
         <Text className="text-base leading-7 text-slate-600">
-          주제와 스타일를 선택해주세요.
+          주제와 스타일을 선택해주세요.
         </Text>
       );
     }
@@ -168,6 +164,40 @@ export default function HomeScreen() {
     }, []),
   );
 
+  // 테마/스타일 변경 시 이전 생성 오디오 상태 리셋
+  const handleThemeChange = (value: string | null) => {
+    setLastGeneratedId(null);
+    setSelectedTheme(value ? (themeDisplayToKey[value] ?? null) : null);
+  };
+
+  const handleStyleChange = (value: string | null) => {
+    setLastGeneratedId(null);
+    setSelectedStyle(value ? (StyleDisplayToKey[value] ?? null) : null);
+  };
+
+  // 화면 복귀 시 TrackPlayer에 남아있는 트랙 ID를 복원하여 재생 버튼 유지
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const activeTrack = await TrackPlayer.getActiveTrack();
+          if (!cancelled && activeTrack?.id) {
+            const parsed = Number(activeTrack.id);
+            if (Number.isFinite(parsed)) {
+              setLastGeneratedId(parsed);
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, []),
+  );
+
   // 오디오 생성 핸들러
   const handleGenerateAudio = () => {
     if (!selectedTheme || !selectedStyle) {
@@ -185,13 +215,13 @@ export default function HomeScreen() {
             await TrackPlayer.add({
               id: data.generated_content_id,
               url: data.audio_url,
-              // url: require('@/assets/audio/1_audio.mp3'),
               title: data.title,
               artist: 'LingoFit',
             });
 
             // 세션 ID 생성 후 캐시에 원본 응답 저장
             qc.setQueryData(['audio', String(data.generated_content_id)], data);
+            setLastGeneratedId(data.generated_content_id);
 
             // navigation과 동시에 백그라운드에서 실행 (await 불필요)
             qc.prefetchQuery({
@@ -203,8 +233,7 @@ export default function HomeScreen() {
             });
             qc.invalidateQueries({ queryKey: [STATS_QUERY_KEY] });
 
-            // 플레이어 화면으로 라우팅 (id만 전달)
-            router.replace(`/audioPlayer/${data.generated_content_id}`);
+            ToastAndroid.show('오디오가 준비됐어요.', ToastAndroid.LONG);
           } catch (e) {
             4;
             console.error('TrackPlayer 처리 중 오류:', e);
@@ -230,112 +259,120 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView
-      className="flex-1 px-5 bg-[#EBF4FB]"
-      showsVerticalScrollIndicator={false}
-    >
-      {/* 인사말 */}
+    <View className="flex-1 bg-[#EBF4FB]">
+      <ScrollView
+        ref={scrollRef}
+        className="flex-1 px-5"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
+        {/* 인사말 */}
 
-      <View className="px-5 pt-6 pb-2">
-        <Text className="text-3xl font-black leading-tight text-slate-900">
-          {/* 한 줄 안에 배치 */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'baseline',
-              flexWrap: 'wrap',
-            }}
-          >
-            <MaskedView
-              maskElement={
-                <Text className="text-3xl font-black leading-tight">
-                  {displayName}
-                </Text>
-              }
+        <View className="px-5 pt-6 pb-2">
+          <Text className="text-3xl font-black leading-tight text-slate-900">
+            {/* 한 줄 안에 배치 */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'baseline',
+                flexWrap: 'wrap',
+              }}
             >
-              <LinearGradient
-                colors={['#38BDF8', '#0EA5E9', '#0284C7'] as const}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+              <MaskedView
+                maskElement={
+                  <Text className="text-3xl font-black leading-tight">
+                    {displayName}
+                  </Text>
+                }
               >
-                <Text className="text-3xl font-black leading-tight opacity-0">
-                  {displayName}
-                </Text>
-              </LinearGradient>
-            </MaskedView>
-            <Text className="text-3xl font-black leading-tight text-slate-900">
-              님,
-            </Text>
+                <LinearGradient
+                  colors={['#38BDF8', '#0EA5E9', '#0284C7'] as const}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text className="text-3xl font-black leading-tight opacity-0">
+                    {displayName}
+                  </Text>
+                </LinearGradient>
+              </MaskedView>
+              <Text className="text-3xl font-black leading-tight text-slate-900">
+                님,
+              </Text>
+            </View>
+            {'\n'}
+            바로 학습을 시작해볼까요?
+          </Text>
+
+          <Text className="my-3 text-[15px] leading-6 text-slate-600">
+            아래에서 듣고 싶은{' '}
+            <Text className="font-semibold text-slate-800">주제</Text>와{' '}
+            <Text className="font-semibold text-slate-800">스타일</Text>을
+            고르면 맞춤 오디오를 만들어드릴게요.
+          </Text>
+        </View>
+
+        {/* 주제 & 스타일 선택 칩 카드 */}
+        <View className="mb-5 rounded-3xl border border-slate-100 bg-white shadow-sm">
+          {/* 주제 */}
+          <View className="p-4 pb-2">
+            <ChipSelectorGroup
+              title="주제"
+              chips={displayedThemes.map(toThemeDisplay)}
+              value={selectedTheme ? toThemeDisplay(selectedTheme) : null}
+              onSelectionChange={handleThemeChange}
+              disabled={!!lastGeneratedId}
+            />
           </View>
-          {'\n'}
-          바로 학습을 시작해볼까요?
-        </Text>
 
-        <Text className="my-3 text-[15px] leading-6 text-slate-600">
-          아래에서 듣고 싶은{' '}
-          <Text className="font-semibold text-slate-800">주제</Text>와{' '}
-          <Text className="font-semibold text-slate-800">스타일</Text>를 고르면
-          맞춤 오디오를 만들어드릴게요.
-        </Text>
-      </View>
+          {/* 구분선 */}
+          <View className="h-[1px] bg-sky-100 mb-5" />
 
-      {/* 주제 & 스타일 선택 칩 카드 */}
-      <View className="mb-5 rounded-3xl border border-slate-100 bg-white shadow-sm">
-        {/* 주제 */}
-        <View className="p-4 pb-2">
-          <ChipSelectorGroup
-            title="주제"
-            chips={displayedThemes.map(toThemeDisplay)}
-            value={selectedTheme ? toThemeDisplay(selectedTheme) : null}
-            onSelectionChange={(value) =>
-              setSelectedTheme(
-                value ? (themeDisplayToKey[value] ?? null) : null,
-              )
-            }
-          />
+          {/* 스타일 */}
+          <View className="p-4 pt-2">
+            <ChipSelectorGroup
+              title="스타일"
+              chips={displayedStyles.map(toStyleDisplay)}
+              value={selectedStyle ? toStyleDisplay(selectedStyle) : null}
+              onSelectionChange={handleStyleChange}
+              disabled={!!lastGeneratedId}
+            />
+          </View>
         </View>
 
-        {/* 구분선 */}
-        <View className="h-[1px] bg-sky-100 mb-5" />
+        {/* 하단 안내 문구 */}
+        {/* 하단 안내 + 버튼 카드 */}
+        <View className="rounded-3xl bg-white border border-sky-100 shadow-md shadow-sky-200/40 px-6 py-5">
+          {/* 섹션 타이틀 */}
+          <Text className="text-sm font-semibold text-sky-600 mb-2">
+            오늘의 선택
+          </Text>
 
-        {/* 스타일 */}
-        <View className="p-4 pt-2">
-          <ChipSelectorGroup
-            title="스타일"
-            chips={displayedStyles.map(toStyleDisplay)}
-            value={selectedStyle ? toStyleDisplay(selectedStyle) : null}
-            onSelectionChange={(value) =>
-              setSelectedStyle(
-                value ? (StyleDisplayToKey[value] ?? null) : null,
-              )
-            }
-          />
-        </View>
-      </View>
+          {/* 안내 문구 */}
+          <View className="mb-6">{focusMessage}</View>
 
-      {/* 하단 안내 문구 */}
-      {/* 하단 안내 + 버튼 카드 */}
-      <View className="rounded-3xl bg-white border border-sky-100 shadow-md shadow-sky-200/40 px-6 py-5">
-        {/* 섹션 타이틀 */}
-        <Text className="text-sm font-semibold text-sky-600 mb-2">
-          오늘의 선택
-        </Text>
+          {/* 구분선 */}
+          <View className="h-[1px] bg-sky-100 mb-5" />
 
-        {/* 안내 문구 */}
-        <View className="mb-6">{focusMessage}</View>
-
-        {/* 구분선 */}
-        <View className="h-[1px] bg-sky-100 mb-5" />
-
-        {/* 오디오 생성 버튼 */}
+          {/* 오디오 생성/재생 단일 버튼 */}
         <GradientButton
-          title="나만의 오디오 만들기"
-          icon="musical-notes"
+          title={lastGeneratedId ? '오디오 재생' : '나만의 오디오 만들기'}
+          loadingMessage="생성 중..."
+          icon={lastGeneratedId ? 'play' : 'musical-notes'}
           loading={isAudioLoading}
-          disabled={!selectedTheme || !selectedStyle}
-          onPress={handleGenerateAudio}
-        />
-      </View>
-    </ScrollView>
+          disabled={
+            isAudioLoading ||
+            (!lastGeneratedId && (!selectedTheme || !selectedStyle))
+          }
+          onPress={() => {
+            if (lastGeneratedId) {
+              router.replace(`/audioPlayer/${lastGeneratedId}`);
+            } else {
+              handleGenerateAudio();
+              }
+            }}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 }

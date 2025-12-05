@@ -4,6 +4,12 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import HTTPException
 from enum import Enum
 from .config import settings
+from .exceptions import AuthTokenExpiredException, InvalidTokenException, InvalidTokenTypeException
+from fastapi.security import HTTPBearer
+
+
+# Swagger에서 Bearer Token 인증 버튼 활성화
+oauth2_scheme = HTTPBearer()
 
 # 패스워드 해싱용 설정
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -17,7 +23,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # JWT 토큰 생성용 설정
 SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 class TokenType(Enum):
@@ -44,13 +50,13 @@ def verify_token(token: str, expected_type: TokenType) -> dict:
         token_type_str: str = payload.get("type")
         
         if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token: no subject")
+            raise InvalidTokenException()
         
         if token_type_str != expected_type.value:
-            raise HTTPException(status_code=401, detail=f"Invalid token type: expected {expected_type.value}, got {token_type_str}")
+            raise InvalidTokenTypeException()
             
         return {"username": username, "token_type": token_type_str, "payload": payload}
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+        raise AuthTokenExpiredException()
     except JWTError as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise InvalidTokenException()

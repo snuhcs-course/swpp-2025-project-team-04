@@ -73,6 +73,16 @@ export default function MainLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: '프로필',
+            headerShown: true,
+            header: () => <MainHeader title="프로필" />,
+            tabBarButton: () => null,
+            tabBarItemStyle: { display: 'none' },
+          }}
+        />
       </Tabs>
     </View>
   );
