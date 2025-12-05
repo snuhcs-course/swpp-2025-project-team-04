@@ -1,20 +1,6 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import Svg, { Circle, G } from 'react-native-svg';
-import Animated, {
-  useSharedValue,
-  useAnimatedProps,
-  withTiming,
-  withSpring,
-  withDelay,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  interpolate,
-  Easing,
-} from 'react-native-reanimated';
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
 interface OverallScoreProps {
   score: number;
@@ -28,79 +14,17 @@ const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
-  const progress = useSharedValue(0);
-  const scale = useSharedValue(0);
-  const pulse = useSharedValue(1);
-  const rotation = useSharedValue(0);
-  
   const MAX_SCORE = 300;
   const safeScore = isNaN(score) ? 0 : score;
   const targetProgress = Math.min(safeScore / MAX_SCORE, 1);
-
-  useEffect(() => {
-    // Entrance animation
-    scale.value = withTiming(1, {
-      duration: 1000,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    // Progress: 0 → target으로 한 번만 채우기
-    progress.value = 0;
-    progress.value = withDelay(
-      200,
-      withTiming(targetProgress, {
-        duration: 1400,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-
-    // Continuous pulse animation - subtle
-    pulse.value = withDelay(
-      2000,
-      withRepeat(
-        withSequence(
-          withTiming(1.02, { duration: 1500 }),
-          withTiming(1, { duration: 1500 }),
-        ),
-        -1,
-        true,
-      ),
-    );
-
-    // Subtle rotation for background ring
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 20000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, [targetProgress]);
-
-  const animatedProps = useAnimatedProps(() => {
-    return {
-      strokeDashoffset: CIRCUMFERENCE * (1 - progress.value),
-    };
-  });
-
-  const containerStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { scale: scale.value * pulse.value },
-      ],
-    };
-  });
-
-  const bgRingStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${rotation.value}deg` }],
-    };
-  });
+  const strokeDashoffset = CIRCUMFERENCE * (1 - targetProgress);
 
   return (
     <View className="items-center justify-center py-8">
-      <Animated.View style={[styles.container, containerStyle]}>
-        {/* Background Decorative Ring (Rotating) */}
-        <Animated.View style={[styles.absoluteFill, bgRingStyle]}>
-           <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
+      <View style={styles.container}>
+        {/* Background Decorative Ring */}
+        <View style={styles.absoluteFill}>
+          <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
             <Circle
               cx={CIRCLE_SIZE / 2}
               cy={CIRCLE_SIZE / 2}
@@ -110,8 +34,8 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
               strokeDasharray="10, 10"
               fill="none"
             />
-           </Svg>
-        </Animated.View>
+          </Svg>
+        </View>
 
         {/* Main Rings */}
         <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE} style={styles.svg}>
@@ -126,7 +50,7 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
             opacity={0.3}
           />
           {/* Progress */}
-          <AnimatedCircle
+          <Circle
             cx={CIRCLE_SIZE / 2}
             cy={CIRCLE_SIZE / 2}
             r={RADIUS}
@@ -134,8 +58,8 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
             strokeWidth={STROKE_WIDTH}
             fill="none"
             strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            animatedProps={animatedProps}
             rotation="-90"
             origin={`${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2}`}
           />
@@ -156,7 +80,7 @@ export function OverallScore({ score, cefrLevel, delta }: OverallScoreProps) {
             )}
           </View>
         </View>
-      </Animated.View>
+      </View>
     </View>
   );
 }
