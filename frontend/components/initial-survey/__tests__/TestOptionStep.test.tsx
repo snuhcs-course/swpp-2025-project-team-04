@@ -14,7 +14,7 @@ describe('TestOptionStep', () => {
 
     expect(screen.getByText(/듣기 테스트를/)).toBeTruthy();
     expect(screen.getByText(/진행할까요?/)).toBeTruthy();
-    expect(screen.getByText('약 3분 소요')).toBeTruthy();
+    expect(screen.getByText('약 3분 소요 · 5 문항')).toBeTruthy();
   });
 
   it('renders both option buttons', () => {

@@ -272,11 +272,9 @@ describe('useInitialSurveyMutations', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(userAPI.updateInterests).toHaveBeenCalledWith([
-        'music',
-        'sports',
-        'technology',
-      ]);
+      expect(userAPI.updateInterests).toHaveBeenCalledWith({
+        interests: ['music', 'sports', 'technology'],
+      });
       expect(result.current.data).toEqual(mockResponse);
     });
 

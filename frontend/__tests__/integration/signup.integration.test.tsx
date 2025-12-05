@@ -38,7 +38,7 @@ describe('Signup Integration Test', () => {
 
     const nicknameInput = getByPlaceholderText('어떻게 불러드릴까요?');
     const usernameInput = getByPlaceholderText('아이디를 입력하세요');
-    const passwordInput = getByPlaceholderText('8~32자, 영문과 숫자 포함');
+    const passwordInput = getByPlaceholderText('3~30자 비밀번호를 입력하세요');
     const confirmPasswordInput = getByPlaceholderText(
       '비밀번호를 다시 입력하세요',
     );
@@ -61,7 +61,7 @@ describe('Signup Integration Test', () => {
 
     const nicknameInput = getByPlaceholderText('어떻게 불러드릴까요?');
     const usernameInput = getByPlaceholderText('아이디를 입력하세요');
-    const passwordInput = getByPlaceholderText('8~32자, 영문과 숫자 포함');
+    const passwordInput = getByPlaceholderText('3~30자 비밀번호를 입력하세요');
     const confirmPasswordInput = getByPlaceholderText(
       '비밀번호를 다시 입력하세요',
     );
@@ -84,7 +84,7 @@ describe('Signup Integration Test', () => {
 
     const nicknameInput = getByPlaceholderText('어떻게 불러드릴까요?');
     const usernameInput = getByPlaceholderText('아이디를 입력하세요');
-    const passwordInput = getByPlaceholderText('8~32자, 영문과 숫자 포함');
+    const passwordInput = getByPlaceholderText('3~30자 비밀번호를 입력하세요');
     const confirmPasswordInput = getByPlaceholderText(
       '비밀번호를 다시 입력하세요',
     );
@@ -109,7 +109,7 @@ describe('Signup Integration Test', () => {
 
     const nicknameInput = getByPlaceholderText('어떻게 불러드릴까요?');
     const usernameInput = getByPlaceholderText('아이디를 입력하세요');
-    const passwordInput = getByPlaceholderText('8~32자, 영문과 숫자 포함');
+    const passwordInput = getByPlaceholderText('3~30자 비밀번호를 입력하세요');
     const confirmPasswordInput = getByPlaceholderText(
       '비밀번호를 다시 입력하세요',
     );
@@ -142,7 +142,7 @@ describe('Signup Integration Test', () => {
 
     const nicknameInput = getByPlaceholderText('어떻게 불러드릴까요?');
     const usernameInput = getByPlaceholderText('아이디를 입력하세요');
-    const passwordInput = getByPlaceholderText('8~32자, 영문과 숫자 포함');
+    const passwordInput = getByPlaceholderText('3~30자 비밀번호를 입력하세요');
     const signupButton = getByText('회원가입');
 
     fireEvent.changeText(nicknameInput, 'TestNick');

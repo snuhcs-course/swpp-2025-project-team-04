@@ -3,6 +3,12 @@ import { render, RenderOptions } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useScrollToTop: jest.fn(),
+  useFocusEffect: jest.fn(),
+}));
+
 interface IntegrationRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient;
 }
@@ -20,11 +26,6 @@ export function renderWithIntegrationProviders(
         mutations: {
           retry: false,
         },
-      },
-      logger: {
-        log: console.log,
-        warn: console.warn,
-        error: () => {},
       },
     }),
     ...renderOptions
@@ -62,11 +63,6 @@ export function createIntegrationTestQueryClient() {
       mutations: {
         retry: false,
       },
-    },
-    logger: {
-      log: console.log,
-      warn: console.warn,
-      error: () => {},
     },
   });
 }

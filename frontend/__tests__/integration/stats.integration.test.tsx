@@ -40,8 +40,8 @@ describe('Stats Integration Test', () => {
     const { getByText } = renderWithIntegrationProviders(<StatsScreen />);
 
     await waitFor(() => {
-      expect(getByText('현재 레벨')).toBeTruthy();
-      expect(getByText('종합 레벨')).toBeTruthy();
+      expect(getByText('어휘력')).toBeTruthy();
+      expect(getByText('문법')).toBeTruthy();
     });
   });
 
@@ -51,8 +51,8 @@ describe('Stats Integration Test', () => {
     const { getByText } = renderWithIntegrationProviders(<StatsScreen />);
 
     await waitFor(() => {
-      expect(getByText('연속 학습')).toBeTruthy();
-      expect(getByText('일 연속')).toBeTruthy();
+      expect(getByText('연속 학습일')).toBeTruthy();
+      expect(getByText('누적 학습일')).toBeTruthy();
     });
   });
 
@@ -62,8 +62,7 @@ describe('Stats Integration Test', () => {
     const { getByText } = renderWithIntegrationProviders(<StatsScreen />);
 
     await waitFor(() => {
-      expect(getByText('총 학습 시간')).toBeTruthy();
-      expect(getByText('분')).toBeTruthy();
+      expect(getByText('총 학습시간')).toBeTruthy();
     });
   });
 

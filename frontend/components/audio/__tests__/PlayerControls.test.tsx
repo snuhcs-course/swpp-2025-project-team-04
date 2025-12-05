@@ -60,7 +60,7 @@ describe('PlayerControls', () => {
       />,
     );
 
-    const finishButton = screen.getByText('학습 끝내기');
+    const finishButton = screen.getByText('학습 종료');
     fireEvent.press(finishButton);
 
     expect(mockOnFinish).toHaveBeenCalledTimes(1);
@@ -75,7 +75,7 @@ describe('PlayerControls', () => {
       />,
     );
 
-    expect(screen.getByText('학습 끝내기')).toBeTruthy();
+    expect(screen.getByText('학습 종료')).toBeTruthy();
   });
 
   it('toggles between play and pause states', () => {
@@ -110,7 +110,7 @@ describe('PlayerControls', () => {
     );
 
     const playButton = screen.getByLabelText('재생');
-    const finishButton = screen.getByLabelText('학습 끝내기');
+    const finishButton = screen.getByLabelText('학습 종료');
 
     expect(playButton).toBeTruthy();
     expect(finishButton).toBeTruthy();
@@ -148,7 +148,7 @@ describe('PlayerControls', () => {
       />,
     );
 
-    const finishButton = screen.getByText('학습 끝내기');
+    const finishButton = screen.getByText('학습 종료');
     fireEvent.press(finishButton);
 
     expect(asyncOnFinish).toHaveBeenCalledTimes(1);

@@ -52,7 +52,9 @@ describe('user API', () => {
 
       mockCustomFetch.mockResolvedValue(mockResponse);
 
-      const result = await updateInterests(['music', 'sports', 'technology']);
+      const result = await updateInterests({
+        interests: ['music', 'sports', 'technology'],
+      });
 
       expect(mockCustomFetch).toHaveBeenCalledWith('/user/me/interests', {
         method: 'PUT',
@@ -68,7 +70,7 @@ describe('user API', () => {
 
       mockCustomFetch.mockResolvedValue(mockResponse);
 
-      const result = await updateInterests([]);
+      const result = await updateInterests({ interests: [] });
 
       expect(mockCustomFetch).toHaveBeenCalledWith('/user/me/interests', {
         method: 'PUT',

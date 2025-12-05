@@ -21,6 +21,7 @@ export function useBehaviorLogs() {
     (key: BehaviorLogKey, amount: number = 1) => {
       setBehaviorLogs((prev) => {
         const updated = { ...prev, [key]: prev[key] + amount };
+        console.log(`📊 [behavior log] ${key}: ${updated[key]}`);
         return updated;
       });
     },

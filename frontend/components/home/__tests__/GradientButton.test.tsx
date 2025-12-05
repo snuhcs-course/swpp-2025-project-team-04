@@ -39,7 +39,7 @@ describe('GradientButton', () => {
   it('shows loading state', () => {
     render(<GradientButton title="Submit" onPress={mockOnPress} loading />);
 
-    expect(screen.getByText('생성 중...')).toBeTruthy();
+    expect(screen.getByText('로딩 중...')).toBeTruthy();
     expect(screen.queryByText('Submit')).toBeNull();
   });
 
@@ -54,7 +54,7 @@ describe('GradientButton', () => {
   it('does not call onPress when loading', () => {
     render(<GradientButton title="Loading" onPress={mockOnPress} loading />);
 
-    const button = screen.getByText('생성 중...').parent?.parent;
+    const button = screen.getByText('로딩 중...').parent?.parent;
     fireEvent.press(button!);
 
     expect(mockOnPress).not.toHaveBeenCalled();

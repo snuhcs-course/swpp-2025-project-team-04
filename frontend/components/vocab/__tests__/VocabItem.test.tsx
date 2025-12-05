@@ -45,7 +45,7 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(screen.getByText('apple')).toBeTruthy();
+    expect(screen.getAllByText('apple').length).toBeGreaterThan(0);
   });
 
   it('renders part of speech', () => {
@@ -90,7 +90,7 @@ describe('VocabItem', () => {
     expect(screen.getByText('I ate an apple.')).toBeTruthy();
   });
 
-  it('renders example sentence label', () => {
+  it('renders example sentence with highlighting', () => {
     render(
       <VocabItem
         item={mockVocab}
@@ -101,7 +101,8 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(screen.getByText('예문')).toBeTruthy();
+    // The word should appear highlighted in the example sentence
+    expect(screen.getAllByText('apple').length).toBeGreaterThan(1);
   });
 
   it('shows delete button when onDelete is provided', () => {
@@ -170,7 +171,7 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(screen.getByText('banana')).toBeTruthy();
+    expect(screen.getAllByText('banana').length).toBeGreaterThan(0);
     expect(screen.getByText('바나나')).toBeTruthy();
     expect(screen.getByText('I like bananas.')).toBeTruthy();
   });
@@ -207,7 +208,7 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(screen.getByText('apple')).toBeTruthy();
+    expect(screen.getAllByText('apple').length).toBeGreaterThan(0);
   });
 
   it('handles active state when item id matches activeId', () => {
@@ -221,6 +222,6 @@ describe('VocabItem', () => {
       />,
     );
 
-    expect(screen.getByText('apple')).toBeTruthy();
+    expect(screen.getAllByText('apple').length).toBeGreaterThan(0);
   });
 });

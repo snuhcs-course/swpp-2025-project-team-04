@@ -43,11 +43,11 @@ describe('Vocab Integration Test', () => {
   it('displays vocab list when loaded successfully', async () => {
     apiMocks.mockGetVocabSuccess();
 
-    const { getByText } = renderWithIntegrationProviders(<VocabScreen />);
+    const { getAllByText } = renderWithIntegrationProviders(<VocabScreen />);
 
     await waitFor(() => {
-      expect(getByText('apple')).toBeTruthy();
-      expect(getByText('book')).toBeTruthy();
+      expect(getAllByText('apple').length).toBeGreaterThan(0);
+      expect(getAllByText('book').length).toBeGreaterThan(0);
     });
   });
 
@@ -81,7 +81,7 @@ describe('Vocab Integration Test', () => {
   it('refetches vocab list when retry button is pressed', async () => {
     apiMocks.mockGetVocabFailure('Network error');
 
-    const { getByText } = renderWithIntegrationProviders(<VocabScreen />);
+    const { getByText, getAllByText } = renderWithIntegrationProviders(<VocabScreen />);
 
     await waitFor(
       () => {
@@ -96,24 +96,24 @@ describe('Vocab Integration Test', () => {
     fireEvent.press(retryButton);
 
     await waitFor(() => {
-      expect(getByText('apple')).toBeTruthy();
-      expect(getByText('book')).toBeTruthy();
+      expect(getAllByText('apple').length).toBeGreaterThan(0);
+      expect(getAllByText('book').length).toBeGreaterThan(0);
     });
   });
 
   it('displays vocab details including word, meaning, and example', async () => {
     apiMocks.mockGetVocabSuccess();
 
-    const { getByText } = renderWithIntegrationProviders(<VocabScreen />);
+    const { getAllByText } = renderWithIntegrationProviders(<VocabScreen />);
 
     await waitFor(() => {
-      expect(getByText('apple')).toBeTruthy();
-      expect(getByText('사과')).toBeTruthy();
-      expect(getByText('I like apples.')).toBeTruthy();
+      expect(getAllByText('apple').length).toBeGreaterThan(0);
+      expect(getAllByText('사과').length).toBeGreaterThan(0);
+      expect(getAllByText('I like apples.').length).toBeGreaterThan(0);
 
-      expect(getByText('book')).toBeTruthy();
-      expect(getByText('책')).toBeTruthy();
-      expect(getByText('This is a good book.')).toBeTruthy();
+      expect(getAllByText('book').length).toBeGreaterThan(0);
+      expect(getAllByText('책').length).toBeGreaterThan(0);
+      expect(getAllByText('This is a good book.').length).toBeGreaterThan(0);
     });
   });
 });

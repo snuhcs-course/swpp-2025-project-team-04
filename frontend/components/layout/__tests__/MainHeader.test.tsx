@@ -100,7 +100,7 @@ describe('MainHeader', () => {
     expect(screen.queryByText('🔥')).toBeNull();
   });
 
-  it('toggles streak tooltip when streak badge is pressed', async () => {
+  it('shows streak tooltip when streak badge is pressed in', async () => {
     queryClient.setQueryData([STATS_QUERY_KEY], {
       streak: { consecutive_days: 3 },
       total_listening_time: 1200,
@@ -112,18 +112,16 @@ describe('MainHeader', () => {
     expect(screen.queryByText('연속 학습 3일차')).toBeNull();
 
     const streakBadge = screen.getByText('🔥');
-    fireEvent.press(streakBadge.parent!);
+    fireEvent(streakBadge.parent!, 'pressIn');
 
     expect(screen.getByText('연속 학습 3일차')).toBeTruthy();
 
-    fireEvent.press(streakBadge.parent!);
+    fireEvent(streakBadge.parent!, 'pressOut');
 
     expect(screen.queryByText('연속 학습 3일차')).toBeNull();
   });
 
-  it('hides tooltip after 2 seconds', async () => {
-    jest.useFakeTimers();
-
+  it('shows correct tooltip text based on streak days', async () => {
     queryClient.setQueryData([STATS_QUERY_KEY], {
       streak: { consecutive_days: 7 },
       total_listening_time: 1200,
@@ -133,17 +131,15 @@ describe('MainHeader', () => {
     renderWithProviders(<MainHeader title="홈" />);
 
     const streakBadge = screen.getByText('🔥');
-    fireEvent.press(streakBadge.parent!);
+    fireEvent(streakBadge.parent!, 'pressIn');
 
     expect(screen.getByText('연속 학습 7일차')).toBeTruthy();
 
-    jest.advanceTimersByTime(2000);
+    fireEvent(streakBadge.parent!, 'pressOut');
 
     await waitFor(() => {
       expect(screen.queryByText('연속 학습 7일차')).toBeNull();
     });
-
-    jest.useRealTimers();
   });
 
   it('renders profile button', () => {
