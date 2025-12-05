@@ -1,29 +1,11 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  SafeAreaView,
-  Dimensions,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, Pressable, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import Animated, {
-  FadeInUp,
-  FadeInDown,
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { OverallScore } from '@/components/level-result/OverallScore';
 import { StatCard } from '@/components/level-result/StatCard';
 import { RadarChart } from '@/components/level-result/RadarChart';
 import { MotivationBadge } from '@/components/level-result/MotivationBadge';
-import { ConfettiOverlay } from '@/components/level-result/ConfettiOverlay';
 
 // ============ 타입 정의 ============
 
@@ -111,30 +93,9 @@ function calculateLevelDetail(score: number, delta: number): LevelDetail {
   };
 }
 
-// Background Blob Component
-function BackgroundBlob({ style }: { style: any }) {
-  return (
-    <Animated.View
-      style={[
-        {
-          position: 'absolute',
-          width: 400,
-          height: 400,
-          borderRadius: 200,
-          opacity: 0.4,
-          backgroundColor: '#bfdbfe', // blue-200
-          // Removed filter: 'blur(60px)' as it causes issues on native
-        },
-        style,
-      ]}
-    />
-  );
-}
-
 export default function LevelResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   // ============ URL 파라미터 파싱 ============
   const lexicalLevel = parseFloat(
@@ -178,91 +139,25 @@ export default function LevelResultScreen() {
   const averageDelta = (lexicalDelta + syntacticDelta + speedDelta) / 3;
   const averageCefr = getCEFRLevel(averageLevel);
 
-  // Background Animations
-  const blob1Y = useSharedValue(0);
-  const blob1X = useSharedValue(0);
-  const blob2Y = useSharedValue(0);
-  const blob2X = useSharedValue(0);
-
-  useEffect(() => {
-    blob1Y.value = withRepeat(
-      withTiming(-100, { duration: 8000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-    blob1X.value = withRepeat(
-      withTiming(50, { duration: 12000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-
-    blob2Y.value = withRepeat(
-      withTiming(100, { duration: 9000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-    blob2X.value = withRepeat(
-      withTiming(-50, { duration: 15000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-  }, []);
-
-  useEffect(() => {
-    setConfettiTrigger(1);
-    const secondBurst = setTimeout(
-      () => setConfettiTrigger((prev) => prev + 1),
-      1800,
-    );
-    const hideOverlay = setTimeout(() => setConfettiTrigger(0), 4500);
-
-    return () => {
-      clearTimeout(secondBurst);
-      clearTimeout(hideOverlay);
-    };
-  }, []);
-
-  const blob1Style = useAnimatedStyle(() => ({
-    transform: [{ translateY: blob1Y.value }, { translateX: blob1X.value }],
-    top: -100,
-    left: -100,
-    backgroundColor: '#dbeafe', // blue-100
-  }));
-
-  const blob2Style = useAnimatedStyle(() => ({
-    transform: [{ translateY: blob2Y.value }, { translateX: blob2X.value }],
-    bottom: -50,
-    right: -100,
-    backgroundColor: '#e0e7ff', // indigo-100
-  }));
-
   return (
     <View className="flex-1 bg-[#F5F9FF]">
-      {/* Dynamic Background */}
-      <View style={StyleSheet.absoluteFill} className="overflow-hidden">
-        <BackgroundBlob style={blob1Style} />
-        <BackgroundBlob style={blob2Style} />
-      </View>
+      {/* Static Background */}
+      <LinearGradient
+        colors={['#f8fbff', '#eef4ff']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
 
       <SafeAreaView className="flex-1">
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <Animated.View
-            entering={FadeInUp.delay(200).springify()}
-            className="items-center pt-6 pb-2"
-          >
+          <View className="items-center pt-6 pb-2">
             <Text className="text-neutral-500 font-bold tracking-widest text-[10px] uppercase mb-1 bg-white/50 px-2 py-1 rounded-full overflow-hidden">
               Session Report
             </Text>
-            <Text className="text-2xl font-black text-neutral-900">
-              학습 분석 결과
-            </Text>
-          </Animated.View>
+            <Text className="text-2xl font-black text-neutral-900">학습 분석 결과</Text>
+          </View>
 
           {/* Overall Score with Circular Progress */}
           <OverallScore
@@ -275,10 +170,7 @@ export default function LevelResultScreen() {
           <MotivationBadge score={averageLevel} delta={averageDelta} />
 
           {/* Radar Chart */}
-          <Animated.View
-            entering={FadeInUp.delay(400).springify()}
-            className="items-center -mt-2 mb-4"
-          >
+          <View className="items-center -mt-2 mb-4">
             <RadarChart
               details={{
                 lexical: lexicalDetail,
@@ -286,7 +178,7 @@ export default function LevelResultScreen() {
                 auditory: auditoryDetail,
               }}
             />
-          </Animated.View>
+          </View>
 
           {/* Stats Grid */}
           <View className="px-5">
@@ -294,36 +186,15 @@ export default function LevelResultScreen() {
               상세 분석
             </Text>
 
-            <StatCard
-              title="어휘력 (Lexical)"
-              icon="book-outline"
-              detail={lexicalDetail}
-              color={LEVEL_COLORS.lexical}
-              index={0}
-            />
+            <StatCard title="어휘력 (Lexical)" icon="book-outline" detail={lexicalDetail} color={LEVEL_COLORS.lexical} />
 
-            <StatCard
-              title="문법 (Syntactic)"
-              icon="git-network-outline"
-              detail={syntacticDetail}
-              color={LEVEL_COLORS.syntactic}
-              index={1}
-            />
+            <StatCard title="문법 (Syntactic)" icon="git-network-outline" detail={syntacticDetail} color={LEVEL_COLORS.syntactic} />
 
-            <StatCard
-              title="청취력 (Auditory)"
-              icon="headset-outline"
-              detail={auditoryDetail}
-              color={LEVEL_COLORS.auditory}
-              index={2}
-            />
+            <StatCard title="청취력 (Auditory)" icon="headset-outline" detail={auditoryDetail} color={LEVEL_COLORS.auditory} />
           </View>
 
           {/* Action Button */}
-          <Animated.View
-            entering={FadeInDown.delay(800).springify()}
-            className="px-5 mt-6"
-          >
+          <View className="px-5 mt-6">
             <Pressable
               className="bg-blue-500 rounded-xl py-4 active:bg-blue-600"
               onPress={() => router.replace('/')}
@@ -331,21 +202,12 @@ export default function LevelResultScreen() {
                 opacity: pressed ? 0.85 : 1,
               })}
             >
-              <Text className="text-white text-center text-lg font-bold">
-                확인
-              </Text>
+              <Text className="text-white text-center text-lg font-bold">확인</Text>
             </Pressable>
-          </Animated.View>
+          </View>
         </ScrollView>
       </SafeAreaView>
 
-      {/* Full Screen Confetti Overlay */}
-      <View
-        style={[StyleSheet.absoluteFill, { zIndex: 100 }]}
-        pointerEvents="none"
-      >
-        <ConfettiOverlay trigger={confettiTrigger} />
-      </View>
     </View>
   );
 }

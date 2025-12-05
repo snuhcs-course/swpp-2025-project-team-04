@@ -1,17 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import Animated, { 
-  FadeInDown, 
-  Layout, 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withDelay, 
-  withTiming, 
-  withSpring,
-  withRepeat,
-  withSequence,
-  Easing
-} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
 interface LevelDetail {
@@ -28,37 +16,21 @@ interface StatCardProps {
   icon: keyof typeof Ionicons.glyphMap;
   detail: LevelDetail;
   color: string;
-  index: number;
   onPress?: () => void;
 }
 
-export function StatCard({ title, icon, detail, color, index, onPress }: StatCardProps) {
+export function StatCard({ title, icon, detail, color, onPress }: StatCardProps) {
   const isPositive = detail.delta >= 0;
-  const progressWidth = useSharedValue(0);
-
-  useEffect(() => {
-    // 0 → 목표 값으로 한 번만 채워서 게이지가 유지되도록 수정
-    progressWidth.value = 0;
-    progressWidth.value = withDelay(
-      250 + index * 120,
-      withTiming(detail.progress_in_current, {
-        duration: 1200,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-  }, [detail.progress_in_current, index]);
-
-  const progressStyle = useAnimatedStyle(() => ({
-    width: `${progressWidth.value}%`,
-    backgroundColor: color,
-  }));
+  const progressStyle = useMemo(
+    () => ({
+      width: `${Math.max(0, Math.min(100, detail.progress_in_current))}%`,
+      backgroundColor: color,
+    }),
+    [color, detail.progress_in_current],
+  );
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(index * 150 + 300).springify()}
-      layout={Layout.springify()}
-      className="mb-4"
-    >
+    <View className="mb-4">
       <Pressable
         onPress={onPress}
         style={({ pressed }) => [
@@ -103,14 +75,11 @@ export function StatCard({ title, icon, detail, color, index, onPress }: StatCar
             <Text className="text-[10px] text-gray-400 font-medium">{detail.current_end}</Text>
           </View>
           <View className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <Animated.View
-              className="h-full rounded-full"
-              style={progressStyle}
-            />
+            <View className="h-full rounded-full" style={progressStyle} />
           </View>
         </View>
       </Pressable>
-    </Animated.View>
+    </View>
   );
 }
 

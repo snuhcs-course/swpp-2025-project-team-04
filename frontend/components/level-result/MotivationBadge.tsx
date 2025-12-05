@@ -1,17 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
-import Animated, { 
-  FadeInDown, 
-  ZoomIn, 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSequence, 
-  withTiming, 
-  withSpring,
-  withDelay,
-  runOnJS,
-  withRepeat,
-} from 'react-native-reanimated';
+import React from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -21,10 +9,7 @@ export interface MotivationBadgeProps {
   onPress?: () => void;
 }
 
-export function MotivationBadge({ score, delta, onPress }: MotivationBadgeProps) {
-  const scale = useSharedValue(1);
-  const breathingScale = useSharedValue(1);
-
+export function MotivationBadge({ score: _score, delta, onPress }: MotivationBadgeProps) {
   // Determine message based on score and delta
   let message = "";
   let icon: keyof typeof Ionicons.glyphMap = "rocket-outline";
@@ -48,57 +33,20 @@ export function MotivationBadge({ score, delta, onPress }: MotivationBadgeProps)
     gradientColors = ['#fbbf24', '#d97706']; // Orange/Gold
   }
 
-  React.useEffect(() => {
-    breathingScale.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
-      ),
-      -1,
-      true
-    );
-  }, []);
-
-  const handlePress = () => {
-    scale.value = withSequence(
-      withTiming(0.9, { duration: 100 }),
-      withSpring(1, { damping: 10 })
-    );
-    
-    if (onPress) {
-      onPress();
-    }
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }]
-  }));
-
-  const breathingStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: breathingScale.value }]
-  }));
-
   return (
     <View className="items-center justify-center my-4 z-50">
-      <Pressable onPress={handlePress}>
-        <Animated.View style={[breathingStyle]}>
-          <Animated.View 
-            entering={ZoomIn.delay(600).springify()}
-            style={[animatedStyle]}
-          >
-            <LinearGradient
-              colors={gradientColors as any}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.badge}
-            >
-              <Ionicons name={icon} size={20} color="white" style={{ marginRight: 8 }} />
-              <Text className="text-white font-bold text-base tracking-wide">
-                {message}
-              </Text>
-            </LinearGradient>
-          </Animated.View>
-        </Animated.View>
+      <Pressable onPress={onPress} disabled={!onPress}>
+        <LinearGradient
+          colors={gradientColors as any}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.badge}
+        >
+          <Ionicons name={icon} size={20} color="white" style={{ marginRight: 8 }} />
+          <Text className="text-white font-bold text-base tracking-wide">
+            {message}
+          </Text>
+        </LinearGradient>
       </Pressable>
     </View>
   );
@@ -117,7 +65,4 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  particle: {
-    position: 'absolute',
-  }
 });
