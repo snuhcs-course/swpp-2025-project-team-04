@@ -5,6 +5,10 @@ jest.mock('expo-router', () => ({
     back: jest.fn(),
   })),
   useLocalSearchParams: jest.fn(() => ({})),
+  useFocusEffect: jest.fn((callback) => {
+    const cleanup = callback();
+    if (cleanup) return cleanup;
+  }),
   router: {
     push: jest.fn(),
     replace: jest.fn(),
@@ -14,6 +18,7 @@ jest.mock('expo-router', () => ({
   Link: jest.fn(),
   Stack: {
     Screen: jest.fn(),
+    Protected: jest.fn(),
   },
 }));
 
@@ -130,6 +135,23 @@ jest.mock(
 jest.mock('react-native-lyric', () => ({
   __esModule: true,
   default: 'LyricView',
+}));
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useFocusEffect: jest.fn((callback) => {
+    const cleanup = callback();
+    if (cleanup) return cleanup;
+  }),
+  useNavigation: jest.fn(() => ({
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  })),
+  useRoute: jest.fn(() => ({
+    params: {},
+  })),
 }));
 
 global.console = {

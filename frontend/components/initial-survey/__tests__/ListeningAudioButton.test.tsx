@@ -84,7 +84,7 @@ describe('ListeningAudioButton', () => {
     it('renders with correct audio number', () => {
       render(<ListeningAudioButton level="intermediate" questionNumber={1} />);
 
-      expect(screen.getByText('오디오 1')).toBeTruthy();
+      expect(screen.getByText('1/5')).toBeTruthy();
     });
 
     it('renders play button initially', () => {
@@ -97,12 +97,12 @@ describe('ListeningAudioButton', () => {
       const { rerender } = render(
         <ListeningAudioButton level="intermediate" questionNumber={1} />,
       );
-      expect(screen.getByText('오디오 1')).toBeTruthy();
+      expect(screen.getByText('1/5')).toBeTruthy();
 
       rerender(
         <ListeningAudioButton level="intermediate" questionNumber={2} />,
       );
-      expect(screen.getByText('오디오 2')).toBeTruthy();
+      expect(screen.getByText('2/5')).toBeTruthy();
     });
   });
 
@@ -241,7 +241,7 @@ describe('ListeningAudioButton', () => {
 
       // state 업데이트 대기
       await waitFor(() => {
-        expect(screen.queryByText('재생')).toBeTruthy();
+        expect(screen.queryByText('다시 듣기')).toBeTruthy();
       });
     });
 
@@ -275,7 +275,7 @@ describe('ListeningAudioButton', () => {
       );
 
       await waitFor(() => {
-        const resumePlayButton = screen.getByText('재생');
+        const resumePlayButton = screen.getByText('다시 듣기');
         fireEvent.press(resumePlayButton);
         expect(mockPlayer.play).toHaveBeenCalledTimes(2);
       });
@@ -463,7 +463,7 @@ describe('ListeningAudioButton', () => {
         <ListeningAudioButton level="intermediate" questionNumber={2} />,
       );
 
-      expect(screen.getByText('오디오 2')).toBeTruthy();
+      expect(screen.getByText('2/5')).toBeTruthy();
       expect(screen.getByText('재생하기')).toBeTruthy();
     });
   });

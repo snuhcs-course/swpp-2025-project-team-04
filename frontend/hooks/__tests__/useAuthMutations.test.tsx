@@ -2,6 +2,7 @@ import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as authAPI from '@/api/auth';
+import * as userAPI from '@/api/user';
 import * as tokenManager from '@/utils/tokenManager';
 import {
   useSignup,
@@ -14,6 +15,7 @@ import { USER_QUERY_KEY } from '@/constants/queryKeys';
 import type { User } from '@/types/type';
 
 jest.mock('@/api/auth');
+jest.mock('@/api/user');
 jest.mock('@/utils/tokenManager');
 const mockReplace = jest.fn();
 jest.mock('expo-router', () => ({
@@ -108,6 +110,7 @@ describe('useAuthMutations', () => {
         id: 1,
         username: 'testuser',
         nickname: 'Test',
+        initial_level_completed: true,
       } as User;
       const mockResponse = {
         user: mockUser,
@@ -116,6 +119,7 @@ describe('useAuthMutations', () => {
       };
 
       (authAPI.login as jest.Mock).mockResolvedValue(mockResponse);
+      (userAPI.getMe as jest.Mock).mockResolvedValue(mockUser);
 
       const { result } = renderHook(() => useLogin(), {
         wrapper: createWrapper(),
